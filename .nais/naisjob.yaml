@@ -1,0 +1,46 @@
+apiVersion: nais.io/v1
+kind: Naisjob
+metadata:
+  labels:
+    team: nks-statistikk
+  name: nks-statistikk-soda
+  namespace: nks-statistikk
+spec:
+  image: ghcr.io/navikt/nada-soda:2023-12-05-00a1c2c
+  accessPolicy:
+    outbound:
+      rules:
+        - application: nada-soda
+          namespace: nada
+  env:
+    - name: SODA_CONFIG
+      value: /var/run/configmaps/soda-config/config.yaml
+    - name: SODA_CHECKS_FOLDER
+      value: /var/run/configmaps/soda-checks
+    - name: SLACK_CHANNEL
+      value: "#team-nks-statistikkoganalyse-soda"
+  schedule: '15 7 * * *'
+  failedJobsHistoryLimit: 1
+  successfulJobsHistoryLimit: 1
+  backoffLimit: 1
+  concurrencyPolicy: Forbid
+  filesFrom:
+    - configmap: soda-checks
+    - configmap: soda-config
+  gcp:
+    permissions:
+    - resource:
+        apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+        kind: Project
+        name: nks-statistikk-prod-80c9
+      role: roles/bigquery.readSessionUser
+    - resource:
+        apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+        kind: Project
+        name: nks-statistikk-prod-80c9
+      role: roles/bigquery.dataViewer
+    - resource:
+        apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+        kind: Project
+        name: nks-statistikk-prod-80c9
+      role: roles/bigquery.jobUser
