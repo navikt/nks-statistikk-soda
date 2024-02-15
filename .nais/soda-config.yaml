@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: soda-config
+  namespace: nks-statistikk
+data:
+  config.yaml: |
+    data_source boost_data:
+      type: bigquery
+      project_id: nks-statistikk-prod-80c9
+      dataset: boost_data
