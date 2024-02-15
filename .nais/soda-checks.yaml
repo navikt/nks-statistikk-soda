@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: soda-checks
+  namespace: nks-statistikk
+data:
+  oppgavestatistikk.yaml: |
+    checks for nks_oppgave_dag_hist:
+      - freshness(version) < 1d: 
+          name: "Sjekker om data er mer enn ett døgn gamle"
+
+    checks for innsyn_oppgave_dag_hist:
+      - freshness(version) < 1d: 
+          name: "Sjekker om data er mer enn ett døgn gamle"
