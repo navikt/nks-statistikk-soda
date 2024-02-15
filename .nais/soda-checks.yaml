@@ -6,9 +6,9 @@ metadata:
 data:
   oppgavestatistikk.yaml: |
     checks for nks_oppgave_dag_hist:
-      - freshness(version) < 1d: 
+      - freshness(dato) < 1d: 
           name: "Sjekker om data er mer enn ett døgn gamle"
 
     checks for innsyn_oppgave_dag_hist:
-      - freshness(version) < 1d: 
+      - freshness(dato) < 1d: 
           name: "Sjekker om data er mer enn ett døgn gamle"
