@@ -5,7 +5,7 @@ metadata:
   namespace: nks-statistikk
 data:
   config.yaml: |
-    data_source boost_data:
+    data_source oppgavestatistikk:
       type: bigquery
       project_id: nks-statistikk-prod-80c9
-      dataset: boost_data
+      dataset: oppgavestatistikk
