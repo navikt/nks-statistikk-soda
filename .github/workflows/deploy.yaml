@@ -1,0 +1,19 @@
+name: build, push and deploy
+on: 
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-20.04
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to prod-gcp
+        uses: nais/deploy/actions/deploy@v2
+        env:
+          CLUSTER: prod-gcp
+          RESOURCE: .nais/soda-config.yaml,.nais/soda-checks.yaml,.nais/naisjob.yaml
