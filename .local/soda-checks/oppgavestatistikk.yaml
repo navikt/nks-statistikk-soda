@@ -1,2 +1,0 @@
-checks for nks_oppgave_dag_hist:
-  - freshness(dato) < 1d
