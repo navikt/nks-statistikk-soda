@@ -1,4 +1,0 @@
-data_source oppgavestatistikk:
-  type: bigquery
-  project_id: nks-statistikk-prod-80c9
-  dataset: oppgavestatistikk
