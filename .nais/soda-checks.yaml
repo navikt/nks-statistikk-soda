@@ -63,7 +63,7 @@ data:
             SELECT 
               CASE 
                 WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
-                WHEN DATE(MAX(date)) >= (CURRENT_DATE() -1) THEN 1 
+                WHEN MAX(date) >= (CURRENT_DATE() -1) THEN 1 
                 ELSE 0 
               END
             FROM chat_concurrency 
@@ -127,7 +127,7 @@ data:
             SELECT 
               CASE 
                 WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
-                WHEN DATE(MAX(dato)) >= (CURRENT_DATE() -1) THEN 1 
+                WHEN MAX(dato) >= (CURRENT_DATE() -1) THEN 1 
                 ELSE 0 
               END
             FROM stilling_agg_dag 
@@ -153,7 +153,7 @@ data:
             SELECT 
               CASE 
                 WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
-                WHEN DATE(MAX(dato)) >= (CURRENT_DATE() -1) THEN 1 
+                WHEN MAX(dato) >= (CURRENT_DATE() -1) THEN 1 
                 ELSE 0 
               END
             FROM topp_frekvens_intradag 
@@ -166,7 +166,7 @@ data:
             SELECT 
               CASE 
                 WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
-                WHEN DATE(MAX(dato)) >= (CURRENT_DATE() -1) THEN 1 
+                WHEN MAX(dato) >= (CURRENT_DATE() -1) THEN 1 
                 ELSE 0 
               END
             FROM topp_trend_intradag 
@@ -179,7 +179,7 @@ data:
             SELECT 
               CASE 
                 WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
-                WHEN DATE(MAX(lastet_tid)) >= (CURRENT_DATE() -1) THEN 1 
+                WHEN DATE(MAX(crm_registered_datetime_formula__c)) >= (CURRENT_DATE() -1) THEN 1 
                 ELSE 0 
               END
             FROM alle_nks_referater 
