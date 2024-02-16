@@ -1,0 +1,28 @@
+filter sto_enhet [begrenset]:
+  where: date > DATE('${NOW}') - 7
+
+filter sto_kanalstatistikk [begrenset]:
+  where: date > DATE('${NOW}') - 7
+
+filter case_milestone [begrenset]:
+  where: start_date > DATE('${NOW}') - 7
+     
+checks for sto_enhet [begrenset]:
+  - freshness(date) < 1d: 
+      name: "Sjekker om data er mer enn ett døgn gamle"
+
+checks for sto_kanalstatistikk [begrenset]:
+  - freshness(date) < 1d: 
+      name: "Sjekker om data er mer enn ett døgn gamle"
+          
+checks for case_milestone [begrenset]:
+  - freshness(start_date) < 1d: 
+      name: "Sjekker om data er mer enn ett døgn gamle"
+          
+checks for sto_beholdning:
+  - freshness(dato_tid) < 1d: 
+      name: "Sjekker om data er mer enn ett døgn gamle"
+          
+checks for user:
+  - freshness(last_til_bq_ts) < 1d: 
+      name: "Sjekker om data er mer enn ett døgn gamle"

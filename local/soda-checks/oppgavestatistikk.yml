@@ -1,0 +1,15 @@
+filter nks_oppgave_dag_hist [begrenset]:
+  where: dato > DATE('${NOW}') - 7
+
+filter innsyn_oppgave_dag_hist [begrenset]:
+  where: dato > DATE('${NOW}') - 7
+ 
+checks for nks_oppgave_dag_hist [begrenset]:
+  - freshness(dato) < 1d: 
+      name: "Sjekker om data er mer enn ett døgn gamle"
+
+checks for innsyn_oppgave_dag_hist [begrenset]:
+  - freshness(dato) < 1d: 
+      name: "Sjekker om data er mer enn ett døgn gamle"
+ 
+

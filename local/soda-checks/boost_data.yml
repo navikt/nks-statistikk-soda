@@ -1,0 +1,38 @@
+filter boost_chat_hour_raw [begrenset]:
+  where: period > DATE('${NOW}') - 7
+
+filter boost_chat_human_transfer_day_raw [begrenset]:
+  where: period > DATE('${NOW}') - 7
+
+filter boost_chat_intents_day_raw [begrenset]:
+  where: period > DATE('${NOW}') - 7
+     
+checks for boost_chat_hour_raw [begrenset]:
+  - freshness(period) < 1d: 
+      name: "Sjekker om data er mer enn ett døgn gamle"
+
+checks for boost_chat_human_transfer_day_raw [begrenset]:
+  - freshness(period) < 1d: 
+      name: "Sjekker om data er mer enn ett døgn gamle"
+          
+checks for boost_chat_intents_day_raw [begrenset]:
+  - freshness(period) < 1d: 
+      name: "Sjekker om data er mer enn ett døgn gamle"  
+ 
+checks for boost_chat_intents_day_raw:
+  - failed rows:
+      fail query: |
+        with duplicated_records as (
+          select
+            period,
+            id
+          from boost_chat_intents_day_raw
+          group by period, id
+          having count(*) > 1
+        )
+        select
+          q.*
+        from boost_chat_intents_day_raw q
+        join duplicated_records dup
+          on q.period = dup.period
+          and q.id = dup.id

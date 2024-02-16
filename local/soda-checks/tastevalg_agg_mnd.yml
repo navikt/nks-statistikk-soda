@@ -1,0 +1,95 @@
+checks for andre_familiehenvendelser:
+  - UpdatedDateOk > 0:
+      name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+      UpdatedDateOk query: |
+        SELECT 
+          CASE 
+            WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+            WHEN DATE(MAX(sist_oppdatert_tidspunkt)) >= (CURRENT_DATE() -1) THEN 1 
+            ELSE 0 
+          END
+        FROM andre_familiehenvendelser
+
+checks for arbeidsavklaringspenger:
+  - UpdatedDateOk > 0:
+      name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+      UpdatedDateOk query: |
+            SELECT 
+              CASE 
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN DATE(MAX(sist_oppdatert_tidspunkt)) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM arbeidsavklaringspenger
+
+checks for barnebidrag:
+  - UpdatedDateOk > 0:
+      name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+      UpdatedDateOk query: |
+            SELECT 
+              CASE 
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN DATE(MAX(sist_oppdatert_tidspunkt)) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM barnebidrag
+
+checks for barnebidrag_undermeny:
+  - UpdatedDateOk > 0:
+      name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+      UpdatedDateOk query: |
+            SELECT 
+              CASE 
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN DATE(MAX(sist_oppdatert_tidspunkt)) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM barnebidrag_undermeny
+
+checks for foreldrepenger:
+  - UpdatedDateOk > 0:
+      name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+      UpdatedDateOk query: |
+            SELECT 
+              CASE 
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN DATE(MAX(sist_oppdatert_tidspunkt)) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM foreldrepenger
+
+checks for jobbsoker:
+  - UpdatedDateOk > 0:
+      name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+      UpdatedDateOk query: |
+            SELECT 
+              CASE 
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN DATE(MAX(sist_oppdatert_tidspunkt)) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM jobbsoker
+    
+checks for pleiepenger:
+  - UpdatedDateOk > 0:
+      name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+      UpdatedDateOk query: |
+            SELECT 
+              CASE 
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN DATE(MAX(sist_oppdatert_tidspunkt)) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM pleiepenger
+
+checks for sykepenger:
+  - UpdatedDateOk > 0:
+      name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+      UpdatedDateOk query: |
+            SELECT 
+              CASE 
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN DATE(MAX(sist_oppdatert_tidspunkt)) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM sykepenger
