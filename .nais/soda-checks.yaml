@@ -6,10 +6,10 @@ metadata:
 data:
   oppgavestatistikk.yaml: |
     filter nks_oppgave_dag_hist [begrenset]:
-     where: dato > DATE('${NOW}') - 7
+      where: dato > DATE('${NOW}') - 7
 
     filter innsyn_oppgave_dag_hist [begrenset]:
-     where: dato > DATE('${NOW}') - 7
+      where: dato > DATE('${NOW}') - 7
  
     checks for nks_oppgave_dag_hist [begrenset]:
       - freshness(dato) < 1d:
