@@ -9,30 +9,37 @@ data:
       type: bigquery
       project_id: nks-statistikk-prod-80c9
       dataset: oppgavestatistikk
+      
     data_source boost_data:
       type: bigquery
       project_id: nks-statistikk-prod-80c9
       dataset: boost_data
+      
     data_source samtalereferat_data:
       type: bigquery
       project_id: nks-statistikk-prod-80c9
       dataset: samtalereferat_data
+      
     data_source sf_chat_data:
       type: bigquery
       project_id: nks-statistikk-prod-80c9
       dataset: sf_chat_data
+      
     data_source sf_sto_data:
       type: bigquery
       project_id: nks-statistikk-prod-80c9
       dataset: sf_sto_data
+      
     data_source sf_kunnskapsbase:
       type: bigquery
       project_id: nks-statistikk-prod-80c9
       dataset: sf_kunnskapsbase
+      
     data_source stillingsregistrering:
       type: bigquery
       project_id: nks-statistikk-prod-80c9
       dataset: stillingsregistrering
+      
     data_source tastevalg_agg_mnd:
       type: bigquery
       project_id: nks-statistikk-prod-80c9
