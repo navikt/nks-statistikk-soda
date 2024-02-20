@@ -40,3 +40,31 @@ data:
     checks for boost_chat_intents_day_raw [begrenset]:
       - freshness(period) < 1d: 
           name: "Sjekker om data er mer enn ett døgn gamle"
+  
+  sf_chat_data.yaml: |
+    filter chat_enhet [begrenset]:
+      where: date > CURRENT_DATE() - 7
+
+    filter chat_kanalstatistikk [begrenset]:
+      where: date > CURRENT_DATE() - 7
+     
+    checks for chat_enhet [begrenset]:
+      - freshness(date) < 1d: 
+          name: "Sjekker om data er mer enn ett døgn gamle"
+
+    checks for chat_kanalstatistikk [begrenset]:
+      - freshness(date) < 1d: 
+          name: "Sjekker om data er mer enn ett døgn gamle"
+          
+    checks for chat_concurrency:
+      - UpdatedOk > 0:
+          name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+          UpdatedOk query: |
+            SELECT 
+              CASE 
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN MAX(date) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM chat_concurrency 
+            WHERE date > CURRENT_DATE() - 7
