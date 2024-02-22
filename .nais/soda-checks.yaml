@@ -33,14 +33,35 @@ data:
       - freshness(period) < 1d: 
           name: "Sjekker om data er mer enn ett døgn gamle"
 
+    checks for boost_chat_hour_raw:
+      - duplicate_count(period) = 0
+          name: "Sjekker om tabellen inneholder duplikater"
+          
     checks for boost_chat_human_transfer_day_raw [begrenset]:
       - freshness(period) < 1d: 
           name: "Sjekker om data er mer enn ett døgn gamle"
           
+    checks for boost_chat_human_transfer_day_raw:
+      - duplicate_count(period, transferred_to_human) = 0
+          name: "Sjekker om tabellen inneholder duplikater"
+      
     checks for boost_chat_intents_day_raw [begrenset]:
       - freshness(period) < 1d: 
-          name: "Sjekker om data er mer enn ett døgn gamle"
-  
+          name: "Sjekker om data er mer enn ett døgn gamle"    
+          
+    checks for boost_chat_intents_day_raw:
+      - UnknownRoot < 5:
+          name: "Sjekker om det er mange manglende root intents"
+          UnknownRoot query: |
+            SELECT count(*)
+            FROM boost_chat_intents_day_raw i
+            LEFT JOIN root_intent_mapping r
+            on i.intent_title = r.intent
+            WHERE period = CURRENT_DATE() -1
+            AND r.root_intent is NULL
+      - duplicate_count(period, id) = 0
+          name: "Sjekker om tabellen inneholder duplikater"
+          
   sf_chat_data.yaml: |
     filter chat_enhet [begrenset]:
       where: date > CURRENT_DATE() - 7
@@ -51,10 +72,53 @@ data:
     checks for chat_enhet [begrenset]:
       - freshness(date) < 1d: 
           name: "Sjekker om data er mer enn ett døgn gamle"
+          
+    checks for chat_enhet:
+      - failed rows:
+          name: "Sjekker om tabellen inneholder duplikater"
+          fail query: |
+            with duplicated_records as (
+              select
+                date, `interval`, queue, authentication_status, language, unit, count(*)
+              from chat_enhet
+              group by date, `interval`, queue, authentication_status, language, unit
+              having count(*) > 1
+            )
+            select
+              q.*
+            from chat_enhet q
+            join duplicated_records dup
+              on q.date = dup.date
+            and q.interval = dup.interval
+            and q.queue = dup.queue
+            and q.authentication_status = dup.authentication_status
+            and q.language = dup.language
+            and q.unit = dup.unit
 
     checks for chat_kanalstatistikk [begrenset]:
       - freshness(date) < 1d: 
           name: "Sjekker om data er mer enn ett døgn gamle"
+
+    checks for chat_kanalstatistikk:
+      - failed rows:
+          name: "Sjekker om tabellen inneholder duplikater"
+          fail query: |
+            with duplicated_records as (
+              select
+                date, `interval`, queue, authentication_status, language, count(*)
+              from chat_kanalstatistikk
+              group by date, `interval`, queue, authentication_status, language
+              having count(*) > 1
+            )
+            select
+              q.*
+            from chat_kanalstatistikk q
+            join duplicated_records dup
+              on q.date = dup.date
+            and q.interval = dup.interval
+            and q.queue = dup.queue
+            and q.authentication_status = dup.authentication_status
+            and q.language = dup.language
           
     checks for chat_concurrency:
       - UpdatedOk > 0:
@@ -68,6 +132,10 @@ data:
               END
             FROM chat_concurrency 
             WHERE date > CURRENT_DATE() - 7
+            
+    checks for chat_concurrency:
+      - duplicate_count(date, department) = 0
+          name: "Sjekker om tabellen inneholder duplikater"
   
   sf_sto_data.yaml: |
     filter sto_enhet [begrenset]:
@@ -83,14 +151,59 @@ data:
       - freshness(date) < 1d: 
           name: "Sjekker om data er mer enn ett døgn gamle"
 
+    checks for sto_enhet:
+      - failed rows:
+          name: "Sjekker om tabellen inneholder duplikater"
+          fail query: |
+            with duplicated_records as (
+              select
+                date, queue, category, `interval`, unit, count(*)
+              from sto_enhet
+              group by date, queue, category, `interval`, unit
+              having count(*) > 1
+            )
+            select
+              q.*
+            from sto_enhet q
+            join duplicated_records dup
+              on q.date = dup.date
+            and q.queue = dup.queue
+            and q.category = dup.category
+            and q.interval = dup.interval
+            and q.unit = dup.unit
+
     checks for sto_kanalstatistikk [begrenset]:
       - freshness(date) < 1d:
           name: "Sjekker om data er mer enn ett døgn gamle"
           
+    checks for sto_kanalstatistikk:
+      - failed rows:
+          name: "Sjekker om tabellen inneholder duplikater"
+          fail query: |
+            with duplicated_records as (
+              select
+                date, intervall, queue, category, count(*)
+              from sto_kanalstatistikk
+              group by date, intervall, queue, category
+              having count(*) > 1
+            )
+            select
+              q.*
+            from sto_kanalstatistikk q
+            join duplicated_records dup
+              on q.date = dup.date
+            and q.intervall = dup.intervall
+            and q.queue = dup.queue
+            and q.category = dup.category
+    
     checks for case_milestone [begrenset]:
       - freshness(start_date) < 1d:
           name: "Sjekker om data er mer enn ett døgn gamle"
           
+    checks for case_milestone:
+      - duplicate_count(id) = 0
+          name: "Sjekker om tabellen inneholder duplikater" 
+    
     checks for sto_beholdning:
       - freshness(dato_tid) < 1d:
           name: "Sjekker om data er mer enn ett døgn gamle"
@@ -106,6 +219,10 @@ data:
     checks for artikkelvisninger_daglig_snapshot [begrenset]:
       - freshness(Date) < 1d: 
           name: "Sjekker om data er mer enn ett døgn gamle"
+
+    checks for artikkelvisninger_daglig_snapshot:
+      - duplicate_count(KnowledgeArticleId, Date) = 0
+          name: "Sjekker om tabellen inneholder duplikater"
           
     checks for kunnskapsartikler:
       - UpdatedOk > 0:
@@ -118,6 +235,23 @@ data:
                 ELSE 0 
               END
             FROM kunnskapsartikler
+      - failed rows:
+          name: "Sjekker om tabellen inneholder duplikater"
+          fail query: |
+            with duplicated_records as (
+              SELECT KnowledgeArticleId, VersionNumber, count(*) 
+              FROM kunnskapsartikler
+              where PublishStatus <> 'Deleted'
+              group by KnowledgeArticleId, VersionNumber 
+              having count(*) > 1
+            )
+            select
+              q.*
+            from kunnskapsartikler q
+            join duplicated_records dup
+              on q.KnowledgeArticleId = dup.KnowledgeArticleId
+            and q.VersionNumber = dup.VersionNumber
+            where q.PublishStatus <> 'Deleted'
           
   stillingsregistrering.yaml: |     
     checks for stilling_agg_dag:
@@ -132,6 +266,8 @@ data:
               END
             FROM stilling_agg_dag 
             WHERE dato > CURRENT_DATE() - 7
+      - duplicate_count(dato) = 0
+          name: "Sjekker om tabellen inneholder duplikater" 
           
     checks for stilling_beholdning:
       - UpdatedOk > 0:
@@ -158,6 +294,22 @@ data:
               END
             FROM topp_frekvens_intradag 
             WHERE dato > CURRENT_DATE() - 7
+      - failed rows:
+          name: "Sjekker om tabellen inneholder duplikater"
+          fail query: |
+            with duplicated_records as (
+              SELECT dato, temagruppe, topp_frekvens_ord, count(*) 
+              FROM topp_frekvens_intradag
+              group by dato, temagruppe, topp_frekvens_ord
+              having count(*) > 1
+            )
+            select
+              q.*
+            from topp_frekvens_intradag q
+            join duplicated_records dup
+              on q.dato = dup.dato
+            and q.temagruppe = dup.temagruppe
+            and q.topp_frekvens_ord = dup.topp_frekvens_ord
           
     checks for topp_trend_intradag:
       - UpdatedOk > 0:
@@ -171,6 +323,22 @@ data:
               END
             FROM topp_trend_intradag 
             WHERE dato > CURRENT_DATE() - 7
+      - failed rows:
+          name: "Sjekker om tabellen inneholder duplikater"
+          fail query: |
+            with duplicated_records as (
+              SELECT dato, temagruppe, topp_trending_ord, count(*) 
+              FROM topp_trend_intradag
+              group by dato, temagruppe, topp_trending_ord
+              having count(*) > 1
+            )
+            select
+              q.*
+            from topp_trend_intradag q
+            join duplicated_records dup
+              on q.dato = dup.dato
+            and q.temagruppe = dup.temagruppe
+            and q.topp_trending_ord = dup.topp_trending_ord
 
     checks for alle_nks_referater:
       - UpdatedOk > 0:
@@ -184,6 +352,8 @@ data:
               END
             FROM alle_nks_referater 
             WHERE crm_registered_datetime_formula__c > CURRENT_DATE() - 7
+      - duplicate_count(id) = 0
+          name: "Sjekker om tabellen inneholder duplikater"  
 
   tastevalg_agg_mnd.yaml: |
     checks for andre_familiehenvendelser:
@@ -197,6 +367,8 @@ data:
                 ELSE 0 
               END
             FROM andre_familiehenvendelser
+      - duplicate_count(aar, maaned) = 0
+          name: "Sjekker om tabellen inneholder duplikater" 
 
     checks for arbeidsavklaringspenger:
       - UpdatedOk > 0:
@@ -209,6 +381,8 @@ data:
                 ELSE 0 
               END
             FROM arbeidsavklaringspenger
+      - duplicate_count(aar, maaned) = 0
+          name: "Sjekker om tabellen inneholder duplikater"
 
     checks for barnebidrag:
       - UpdatedOk > 0:
@@ -221,6 +395,8 @@ data:
                 ELSE 0 
               END
             FROM barnebidrag
+      - duplicate_count(aar, maaned) = 0
+          name: "Sjekker om tabellen inneholder duplikater"
 
     checks for barnebidrag_undermeny:
       - UpdatedOk > 0:
@@ -245,6 +421,8 @@ data:
                 ELSE 0 
               END
             FROM foreldrepenger
+      - duplicate_count(aar, maaned) = 0
+          name: "Sjekker om tabellen inneholder duplikater"
 
     checks for jobbsoker:
       - UpdatedOk > 0:
@@ -257,6 +435,8 @@ data:
                 ELSE 0 
               END
             FROM jobbsoker
+      - duplicate_count(aar, maaned) = 0
+          name: "Sjekker om tabellen inneholder duplikater"
     
     checks for pleiepenger:
       - UpdatedOk > 0:
@@ -269,6 +449,8 @@ data:
                 ELSE 0 
               END
             FROM pleiepenger
+      - duplicate_count(aar, maaned) = 0
+          name: "Sjekker om tabellen inneholder duplikater"
 
     checks for sykepenger:
       - UpdatedOk > 0:
@@ -281,3 +463,5 @@ data:
                 ELSE 0 
               END
             FROM sykepenger
+      - duplicate_count(aar, maaned) = 0
+          name: "Sjekker om tabellen inneholder duplikater"
