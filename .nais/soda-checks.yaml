@@ -201,7 +201,7 @@ data:
           name: "Sjekker om data er mer enn ett døgn gamle"
           
     checks for case_milestone:
-      - duplicate_count(id) = 0
+      - duplicate_count(id) = 0:
           name: "Sjekker om tabellen inneholder duplikater" 
     
     checks for sto_beholdning:
@@ -266,7 +266,7 @@ data:
               END
             FROM stilling_agg_dag 
             WHERE dato > CURRENT_DATE() - 7
-      - duplicate_count(dato) = 0
+      - duplicate_count(dato) = 0:
           name: "Sjekker om tabellen inneholder duplikater" 
           
     checks for stilling_beholdning:
@@ -352,7 +352,7 @@ data:
               END
             FROM alle_nks_referater 
             WHERE crm_registered_datetime_formula__c > CURRENT_DATE() - 7
-      - duplicate_count(id) = 0
+      - duplicate_count(id) = 0:
           name: "Sjekker om tabellen inneholder duplikater"  
 
   tastevalg_agg_mnd.yaml: |
@@ -367,7 +367,7 @@ data:
                 ELSE 0 
               END
             FROM andre_familiehenvendelser
-      - duplicate_count(aar, maaned) = 0
+      - duplicate_count(aar, maaned) = 0:
           name: "Sjekker om tabellen inneholder duplikater" 
 
     checks for arbeidsavklaringspenger:
@@ -381,7 +381,7 @@ data:
                 ELSE 0 
               END
             FROM arbeidsavklaringspenger
-      - duplicate_count(aar, maaned) = 0
+      - duplicate_count(aar, maaned) = 0:
           name: "Sjekker om tabellen inneholder duplikater"
 
     checks for barnebidrag:
@@ -395,7 +395,7 @@ data:
                 ELSE 0 
               END
             FROM barnebidrag
-      - duplicate_count(aar, maaned) = 0
+      - duplicate_count(aar, maaned) = 0:
           name: "Sjekker om tabellen inneholder duplikater"
 
     checks for barnebidrag_undermeny:
@@ -421,7 +421,7 @@ data:
                 ELSE 0 
               END
             FROM foreldrepenger
-      - duplicate_count(aar, maaned) = 0
+      - duplicate_count(aar, maaned) = 0:
           name: "Sjekker om tabellen inneholder duplikater"
 
     checks for jobbsoker:
@@ -435,7 +435,7 @@ data:
                 ELSE 0 
               END
             FROM jobbsoker
-      - duplicate_count(aar, maaned) = 0
+      - duplicate_count(aar, maaned) = 0:
           name: "Sjekker om tabellen inneholder duplikater"
     
     checks for pleiepenger:
@@ -449,7 +449,7 @@ data:
                 ELSE 0 
               END
             FROM pleiepenger
-      - duplicate_count(aar, maaned) = 0
+      - duplicate_count(aar, maaned) = 0:
           name: "Sjekker om tabellen inneholder duplikater"
 
     checks for sykepenger:
@@ -463,5 +463,5 @@ data:
                 ELSE 0 
               END
             FROM sykepenger
-      - duplicate_count(aar, maaned) = 0
+      - duplicate_count(aar, maaned) = 0:
           name: "Sjekker om tabellen inneholder duplikater"
