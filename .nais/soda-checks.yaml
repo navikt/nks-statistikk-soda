@@ -8,10 +8,10 @@ data:
     filter nks_oppgave_dag_hist [begrenset]:
       where: dato > CURRENT_DATE() - 7
 
-    filter nks_oppgave_dag_hist [begrenset]:
+    filter innsyn_oppgave_dag_hist [begrenset]:
       where: dato > CURRENT_DATE() - 7
   
-    checks for innsyn_oppgave_dag_hist [begrenset]:
+    checks for nks_oppgave_dag_hist [begrenset]:
       - freshness(dato) < 1d:
           name: "Sjekker om data er mer enn ett døgn gamle"
 
