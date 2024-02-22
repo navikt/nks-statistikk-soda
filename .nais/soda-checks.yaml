@@ -4,17 +4,27 @@ metadata:
   name: soda-checks
   namespace: nks-statistikk
 data:
-  oppgavestatistikk.yaml: |
-    filter nks_oppgave_dag_hist [begrenset]:
-      where: dato > CURRENT_DATE() - 7
+  oppgavestatistikk.yaml: |  
+    checks for nks_oppgave_dag_hist:
+      - UpdatedOk > 0:
+          name: "Sjekker om gårsdagens data er på plass"
+          UpdatedOk query: |
+            SELECT 
+              CASE 
+                WHEN MAX(dato) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM nks_oppgave_dag_hist
+            WHERE dato > CURRENT_DATE() - 7
 
-    filter innsyn_oppgave_dag_hist [begrenset]:
-      where: dato > CURRENT_DATE() - 7
-  
-    checks for nks_oppgave_dag_hist [begrenset]:
-      - freshness(dato) < 1d:
-          name: "Sjekker om data er mer enn ett døgn gamle"
-
-    checks for innsyn_oppgave_dag_hist [begrenset]:
-      - freshness(dato) < 1d:
-          name: "Sjekker om data er mer enn ett døgn gamle"
+    checks for innsyn_oppgave_dag_hist:
+      - UpdatedOk > 0:
+          name: "Sjekker om gårsdagens data er på plass"
+          UpdatedOk query: |
+            SELECT 
+              CASE 
+                WHEN MAX(dato) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM innsyn_oppgave_dag_hist
+            WHERE dato > CURRENT_DATE() - 7
