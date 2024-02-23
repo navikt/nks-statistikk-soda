@@ -28,3 +28,55 @@ data:
               END
             FROM innsyn_oppgave_dag_hist
             WHERE dato > CURRENT_DATE() - 7
+  
+  boost_data.yaml: |    
+    checks for boost_chat_hour_raw:
+      - UpdatedOk > 0:
+          name: "Sjekker om gårsdagens data er på plass"
+          UpdatedOk query: |
+            SELECT 
+              CASE 
+                WHEN MAX(DATE(period)) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM boost_chat_hour_raw
+            WHERE DATE(period) > CURRENT_DATE() - 7
+      - duplicate_count(period) = 0:
+          name: "Sjekker om tabellen inneholder duplikater"
+          
+    checks for boost_chat_human_transfer_day_raw:
+      - UpdatedOk > 0:
+          name: "Sjekker om gårsdagens data er på plass"
+          UpdatedOk query: |
+            SELECT 
+              CASE 
+                WHEN MAX(period) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM boost_chat_human_transfer_day_raw
+            WHERE period > CURRENT_DATE() - 7
+      - duplicate_count(period, transferred_to_human) = 0:
+          name: "Sjekker om tabellen inneholder duplikater"
+          
+    checks for boost_chat_intents_day_raw:
+      - UpdatedOk > 0:
+          name: "Sjekker om gårsdagens data er på plass"
+          UpdatedOk query: |
+            SELECT 
+              CASE 
+                WHEN MAX(period) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM boost_chat_intents_day_raw
+            WHERE period > CURRENT_DATE() - 7
+      - UnknownRoot < 5:
+          name: "Sjekker om det er mange manglende root intents"
+          UnknownRoot query: |
+            SELECT count(*)
+            FROM boost_chat_intents_day_raw i
+            LEFT JOIN root_intent_mapping r
+            ON i.intent_title = r.intent
+            WHERE period = CURRENT_DATE() -1
+            AND r.root_intent is NULL
+      - duplicate_count(period, id) = 0:
+          name: "Sjekker om tabellen inneholder duplikater"
