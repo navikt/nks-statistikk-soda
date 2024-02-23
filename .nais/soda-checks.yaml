@@ -161,3 +161,87 @@ data:
             WHERE date > CURRENT_DATE() - 7
       - duplicate_count(date, department) = 0:
           name: "Sjekker om tabellen inneholder duplikater"
+
+  sf_sto_data.yaml: |
+    checks for sto_enhet:
+      - UpdatedOk > 0:
+          name: "Sjekker om gårsdagens data er på plass"
+          UpdatedOk query: |
+            SELECT 
+              CASE 
+                WHEN MAX(date) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM sto_enhet
+            WHERE date > CURRENT_DATE() - 7
+      - failed rows:
+          name: "Sjekker om tabellen inneholder duplikater"
+          fail query: |
+            with duplicated_records as (
+              select
+                date, queue, category, `interval`, unit, count(*)
+              from sto_enhet
+              group by date, queue, category, `interval`, unit
+              having count(*) > 1
+            )
+            select
+              q.*
+            from sto_enhet q
+            join duplicated_records dup
+              on q.date = dup.date
+            and q.queue = dup.queue
+            and q.category = dup.category
+            and q.interval = dup.interval
+            and q.unit = dup.unit
+
+    checks for sto_kanalstatistikk:
+      - UpdatedOk > 0:
+          name: "Sjekker om gårsdagens data er på plass"
+          UpdatedOk query: |
+            SELECT 
+              CASE 
+                WHEN MAX(date) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM sto_kanalstatistikk
+            WHERE date > CURRENT_DATE() - 7
+      - failed rows:
+          name: "Sjekker om tabellen inneholder duplikater"
+          fail query: |
+            with duplicated_records as (
+              select
+                date, intervall, queue, category, count(*)
+              from sto_kanalstatistikk
+              group by date, intervall, queue, category
+              having count(*) > 1
+            )
+            select
+              q.*
+            from sto_kanalstatistikk q
+            join duplicated_records dup
+              on q.date = dup.date
+            and q.intervall = dup.intervall
+            and q.queue = dup.queue
+            and q.category = dup.category
+          
+    checks for case_milestone:
+      - UpdatedOk > 0:
+          name: "Sjekker om gårsdagens data er på plass"
+          UpdatedOk query: |
+            SELECT 
+              CASE 
+                WHEN MAX(start_date) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM case_milestone
+            WHERE start_date > CURRENT_DATE() - 7
+      - duplicate_count(id) = 0:
+          name: "Sjekker om tabellen inneholder duplikater" 
+    
+    checks for sto_beholdning:
+      - freshness(dato_tid) < 1d:
+          name: "Sjekker om gårsdagens data er på plass"
+          
+    checks for user:
+      - freshness(last_til_bq_ts) < 1d: 
+          name: "Sjekker om gårsdagens data er på plass"
