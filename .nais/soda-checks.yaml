@@ -245,3 +245,47 @@ data:
     checks for user:
       - freshness(last_til_bq_ts) < 1d: 
           name: "Sjekker om gårsdagens data er på plass"
+
+  sf_kunnskapsbase.yaml: |
+    checks for artikkelvisninger_daglig_snapshot:
+      - UpdatedOk > 0:
+          name: "Sjekker om gårsdagens data er på plass"
+          UpdatedOk query: |
+            SELECT 
+              CASE 
+                WHEN MAX(Date) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM artikkelvisninger_daglig_snapshot
+            WHERE Date > CURRENT_DATE() - 7
+      - duplicate_count(KnowledgeArticleId, Date) = 0:
+          name: "Sjekker om tabellen inneholder duplikater"
+          
+    checks for kunnskapsartikler:
+      - UpdatedOk > 0:
+          name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+          UpdatedOk query: |
+            SELECT 
+              CASE 
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN DATE(MAX(load_to_bq_ts)) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM kunnskapsartikler
+      - failed rows:
+          name: "Sjekker om tabellen inneholder duplikater"
+          fail query: |
+            with duplicated_records as (
+              SELECT KnowledgeArticleId, VersionNumber, count(*) 
+              FROM kunnskapsartikler
+              where PublishStatus <> 'Deleted'
+              group by KnowledgeArticleId, VersionNumber 
+              having count(*) > 1
+            )
+            select
+              q.*
+            from kunnskapsartikler q
+            join duplicated_records dup
+              on q.KnowledgeArticleId = dup.KnowledgeArticleId
+            and q.VersionNumber = dup.VersionNumber
+            where q.PublishStatus <> 'Deleted'
