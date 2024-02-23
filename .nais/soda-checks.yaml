@@ -80,3 +80,84 @@ data:
             AND r.root_intent is NULL
       - duplicate_count(period, id) = 0:
           name: "Sjekker om tabellen inneholder duplikater"
+
+  sf_chat_data.yaml: |        
+    checks for chat_enhet:
+      - UpdatedOk > 0:
+          name: "Sjekker om gårsdagens data er på plass(hvis igår var hverdag)"
+          UpdatedOk query: |
+            SELECT 
+              CASE 
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN MAX(date) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM chat_enhet
+            WHERE date > CURRENT_DATE() - 7
+      - failed rows:
+          name: "Sjekker om tabellen inneholder duplikater"
+          fail query: |
+            with duplicated_records as (
+              select
+                date, `interval`, queue, authentication_status, language, unit, count(*)
+              from chat_enhet
+              group by date, `interval`, queue, authentication_status, language, unit
+              having count(*) > 1
+            )
+            select
+              q.*
+            from chat_enhet q
+            join duplicated_records dup
+              on q.date = dup.date
+            and q.interval = dup.interval
+            and q.queue = dup.queue
+            and q.authentication_status = dup.authentication_status
+            and q.language = dup.language
+            and q.unit = dup.unit
+
+    checks for chat_kanalstatistikk:
+      - UpdatedOk > 0:
+          name: "Sjekker om gårsdagens data er på plass (hvis igår var hverdag)"
+          UpdatedOk query: |
+            SELECT 
+              CASE 
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN MAX(date) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM chat_kanalstatistikk
+            WHERE date > CURRENT_DATE() - 7
+      - failed rows:
+          name: "Sjekker om tabellen inneholder duplikater"
+          fail query: |
+            with duplicated_records as (
+              select
+                date, `interval`, queue, authentication_status, language, count(*)
+              from chat_kanalstatistikk
+              group by date, `interval`, queue, authentication_status, language
+              having count(*) > 1
+            )
+            select
+              q.*
+            from chat_kanalstatistikk q
+            join duplicated_records dup
+              on q.date = dup.date
+            and q.interval = dup.interval
+            and q.queue = dup.queue
+            and q.authentication_status = dup.authentication_status
+            and q.language = dup.language
+          
+    checks for chat_concurrency:
+      - UpdatedOk > 0:
+          name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+          UpdatedOk query: |
+            SELECT 
+              CASE 
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN MAX(date) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM chat_concurrency 
+            WHERE date > CURRENT_DATE() - 7
+      - duplicate_count(date, department) = 0:
+          name: "Sjekker om tabellen inneholder duplikater"
