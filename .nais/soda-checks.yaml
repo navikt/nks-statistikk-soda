@@ -289,3 +289,216 @@ data:
               on q.KnowledgeArticleId = dup.KnowledgeArticleId
             and q.VersionNumber = dup.VersionNumber
             where q.PublishStatus <> 'Deleted'
+
+  stillingsregistrering.yaml: |     
+    checks for stilling_agg_dag:
+      - UpdatedOk > 0:
+          name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+          UpdatedOk query: |
+            SELECT 
+              CASE 
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN MAX(dato) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM stilling_agg_dag 
+            WHERE dato > CURRENT_DATE() - 7
+      - duplicate_count(dato) = 0:
+          name: "Sjekker om tabellen inneholder duplikater" 
+          
+    checks for stilling_beholdning:
+      - UpdatedOk > 0:
+          name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+          UpdatedOk query: |
+            SELECT 
+              CASE 
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN DATE(MAX(last_updated_ts)) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM stilling_beholdning
+            
+  samtalereferat_data.yaml: |
+    checks for topp_frekvens_intradag:
+      - UpdatedOk > 0:
+          name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+          UpdatedOk query: |
+            SELECT 
+              CASE 
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN MAX(dato) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM topp_frekvens_intradag 
+            WHERE dato > CURRENT_DATE() - 7
+      - failed rows:
+          name: "Sjekker om tabellen inneholder duplikater"
+          fail query: |
+            with duplicated_records as (
+              SELECT dato, temagruppe, topp_frekvens_ord, count(*) 
+              FROM topp_frekvens_intradag
+              group by dato, temagruppe, topp_frekvens_ord
+              having count(*) > 1
+            )
+            select
+              q.*
+            from topp_frekvens_intradag q
+            join duplicated_records dup
+              on q.dato = dup.dato
+            and q.temagruppe = dup.temagruppe
+            and q.topp_frekvens_ord = dup.topp_frekvens_ord
+          
+    checks for topp_trend_intradag:
+      - UpdatedOk > 0:
+          name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+          UpdatedOk query: |
+            SELECT 
+              CASE 
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN MAX(dato) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM topp_trend_intradag 
+            WHERE dato > CURRENT_DATE() - 7
+      - failed rows:
+          name: "Sjekker om tabellen inneholder duplikater"
+          fail query: |
+            with duplicated_records as (
+              SELECT dato, temagruppe, topp_trending_ord, count(*) 
+              FROM topp_trend_intradag
+              group by dato, temagruppe, topp_trending_ord
+              having count(*) > 1
+            )
+            select
+              q.*
+            from topp_trend_intradag q
+            join duplicated_records dup
+              on q.dato = dup.dato
+            and q.temagruppe = dup.temagruppe
+            and q.topp_trending_ord = dup.topp_trending_ord
+
+    checks for alle_nks_referater:
+      - UpdatedOk > 0:
+          name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+          UpdatedOk query: |
+            SELECT 
+              CASE 
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN DATE(MAX(crm_registered_datetime_formula__c)) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM alle_nks_referater 
+            WHERE DATE(crm_registered_datetime_formula__c) > CURRENT_DATE() - 7
+      - duplicate_count(id) = 0:
+          name: "Sjekker om tabellen inneholder duplikater"  
+
+  tastevalg_agg_mnd.yaml: |
+    checks for andre_familiehenvendelser:
+      - UpdatedOk > 0:
+          name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+          UpdatedOk query: |
+            SELECT 
+              CASE 
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN DATE(MAX(sist_oppdatert_tidspunkt)) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM andre_familiehenvendelser
+      - duplicate_count(aar, maaned) = 0:
+          name: "Sjekker om tabellen inneholder duplikater" 
+
+    checks for arbeidsavklaringspenger:
+      - UpdatedOk > 0:
+          name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+          UpdatedOk query: |
+            SELECT 
+              CASE 
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN DATE(MAX(sist_oppdatert_tidspunkt)) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM arbeidsavklaringspenger
+      - duplicate_count(aar, maaned) = 0:
+          name: "Sjekker om tabellen inneholder duplikater"
+
+    checks for barnebidrag:
+      - UpdatedOk > 0:
+          name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+          UpdatedOk query: |
+            SELECT 
+              CASE 
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN DATE(MAX(sist_oppdatert_tidspunkt)) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM barnebidrag
+      - duplicate_count(aar, maaned) = 0:
+          name: "Sjekker om tabellen inneholder duplikater"
+
+    checks for barnebidrag_undermeny:
+      - UpdatedOk > 0:
+          name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+          UpdatedOk query: |
+            SELECT 
+              CASE 
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN DATE(MAX(sist_oppdatert_tidspunkt)) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM barnebidrag_undermeny
+
+    checks for foreldrepenger:
+      - UpdatedOk > 0:
+          name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+          UpdatedOk query: |
+            SELECT 
+              CASE 
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN DATE(MAX(sist_oppdatert_tidspunkt)) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM foreldrepenger
+      - duplicate_count(aar, maaned) = 0:
+          name: "Sjekker om tabellen inneholder duplikater"
+
+    checks for jobbsoker:
+      - UpdatedOk > 0:
+          name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+          UpdatedOk query: |
+            SELECT 
+              CASE 
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN DATE(MAX(sist_oppdatert_tidspunkt)) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM jobbsoker
+      - duplicate_count(aar, maaned) = 0:
+          name: "Sjekker om tabellen inneholder duplikater"
+    
+    checks for pleiepenger:
+      - UpdatedOk > 0:
+          name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+          UpdatedOk query: |
+            SELECT 
+              CASE 
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN DATE(MAX(sist_oppdatert_tidspunkt)) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM pleiepenger
+      - duplicate_count(aar, maaned) = 0:
+          name: "Sjekker om tabellen inneholder duplikater"
+
+    checks for sykepenger:
+      - UpdatedOk > 0:
+          name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+          UpdatedOk query: |
+            SELECT 
+              CASE 
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN DATE(MAX(sist_oppdatert_tidspunkt)) >= (CURRENT_DATE() -1) THEN 1 
+                ELSE 0 
+              END
+            FROM sykepenger
+      - duplicate_count(aar, maaned) = 0:
+          name: "Sjekker om tabellen inneholder duplikater"
