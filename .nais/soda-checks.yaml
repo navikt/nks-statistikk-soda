@@ -165,10 +165,11 @@ data:
   sf_sto_data.yaml: |
     checks for sto_enhet:
       - UpdatedOk > 0:
-          name: "Sjekker om gårsdagens data er på plass"
+          name: "Sjekker om gårsdagens data er på plass (hvis igår var hverdag)"
           UpdatedOk query: |
             SELECT 
               CASE 
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
                 WHEN MAX(date) >= (CURRENT_DATE() -1) THEN 1 
                 ELSE 0 
               END
