@@ -396,11 +396,11 @@ data:
   tastevalg_agg_mnd.yaml: |
     checks for andre_familiehenvendelser:
       - UpdatedOk > 0:
-          name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+          name: "Sjekker om data har kommet inn i dag (hvis idag er en hverdag)"
           UpdatedOk query: |
             SELECT 
               CASE 
-                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (7,1) THEN 2
                 WHEN DATE(MAX(sist_oppdatert_tidspunkt)) = CURRENT_DATE() THEN 1 
                 ELSE 0 
               END
@@ -410,11 +410,11 @@ data:
 
     checks for arbeidsavklaringspenger:
       - UpdatedOk > 0:
-          name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+          name: "Sjekker om data har kommet inn i dag (hvis idag er en hverdag)"
           UpdatedOk query: |
             SELECT 
               CASE 
-                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (7,1) THEN 2
                 WHEN DATE(MAX(sist_oppdatert_tidspunkt)) >= CURRENT_DATE() THEN 1
                 ELSE 0 
               END
@@ -424,11 +424,11 @@ data:
 
     checks for barnebidrag:
       - UpdatedOk > 0:
-          name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+          name: "Sjekker om data har kommet inn i dag (hvis idag er en hverdag)"
           UpdatedOk query: |
             SELECT 
               CASE 
-                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (7,1) THEN 2
                 WHEN DATE(MAX(sist_oppdatert_tidspunkt)) >= CURRENT_DATE() THEN 1 
                 ELSE 0 
               END
@@ -438,11 +438,11 @@ data:
 
     checks for barnebidrag_undermeny:
       - UpdatedOk > 0:
-          name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+          name: "Sjekker om data har kommet inn i dag (hvis idag er en hverdag)"
           UpdatedOk query: |
             SELECT 
               CASE 
-                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (7,1) THEN 2
                 WHEN DATE(MAX(sist_oppdatert_tidspunkt)) >= CURRENT_DATE() THEN 1 
                 ELSE 0 
               END
@@ -450,11 +450,11 @@ data:
 
     checks for foreldrepenger:
       - UpdatedOk > 0:
-          name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+          name: "Sjekker om data har kommet inn i dag (hvis idag er en hverdag)"
           UpdatedOk query: |
             SELECT 
               CASE 
-                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (7,1) THEN 2
                 WHEN DATE(MAX(sist_oppdatert_tidspunkt)) >= CURRENT_DATE() THEN 1
                 ELSE 0 
               END
@@ -464,11 +464,11 @@ data:
 
     checks for jobbsoker:
       - UpdatedOk > 0:
-          name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+          name: "Sjekker om data har kommet inn i dag (hvis idag er en hverdag)"
           UpdatedOk query: |
             SELECT 
               CASE 
-                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (7,1) THEN 2
                 WHEN DATE(MAX(sist_oppdatert_tidspunkt)) >= CURRENT_DATE() THEN 1 
                 ELSE 0 
               END
@@ -478,11 +478,11 @@ data:
     
     checks for pleiepenger:
       - UpdatedOk > 0:
-          name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+          name: "Sjekker om data har kommet inn i dag (hvis idag er en hverdag)"
           UpdatedOk query: |
             SELECT 
               CASE 
-                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (7,1) THEN 2
                 WHEN DATE(MAX(sist_oppdatert_tidspunkt)) >= CURRENT_DATE() THEN 1 
                 ELSE 0 
               END
@@ -492,11 +492,11 @@ data:
 
     checks for sykepenger:
       - UpdatedOk > 0:
-          name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+          name: "Sjekker om data har kommet inn i dag (hvis idag er en hverdag)"
           UpdatedOk query: |
             SELECT 
               CASE 
-                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (7,1) THEN 2
                 WHEN DATE(MAX(sist_oppdatert_tidspunkt)) >= CURRENT_DATE() THEN 1 
                 ELSE 0 
               END
@@ -506,11 +506,11 @@ data:
 
     checks for uforetrygd:
       - UpdatedOk > 0:
-          name: "Sjekker om data er mer enn ett døgn gamle (hvis igår var hverdag)"
+          name: "Sjekker om data har kommet inn i dag (hvis idag er en hverdag)"
           UpdatedOk query: |
             SELECT 
               CASE 
-                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (1,2) THEN 2
+                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE())  in (7,1) THEN 2
                 WHEN DATE(MAX(sist_oppdatert_tidspunkt)) >= CURRENT_DATE() THEN 1 
                 ELSE 0 
               END
