@@ -81,7 +81,7 @@ data:
             )
             
             SELECT
-            IF(COUNT(1) > 0, 1, 0) AS data_exists
+            IF(COUNT(1) > 0, 1, 0)
             FROM chat_enhet
             CROSS JOIN date_to_check
             WHERE date = date_to_check.check_date
@@ -120,7 +120,7 @@ data:
             )
             
             SELECT
-            IF(COUNT(1) > 0, 1, 0) AS data_exists
+            IF(COUNT(1) > 0, 1, 0)
             FROM chat_kanalstatistikk
             CROSS JOIN date_to_check
             WHERE date = date_to_check.check_date
@@ -158,11 +158,32 @@ data:
             )
             
             SELECT
-            IF(COUNT(1) > 0, 1, 0) AS data_exists
+            IF(COUNT(1) > 0, 1, 0)
             FROM chat_concurrency
             CROSS JOIN date_to_check
             WHERE date = date_to_check.check_date
       - duplicate_count(date, department) = 0:
+          name: "Sjekker om tabellen inneholder duplikater"
+
+    checks for live_chat_transcript:
+      - UpdatedOk > 0:
+          name: "Sjekk om data fra i går eksisterer hvis i går var en hverdag. Ellers sjekk data fra fredag."
+          UpdatedOk query: |
+            WITH date_to_check AS (
+             SELECT
+              CASE
+               WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 2 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY) -- Monday
+               WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 1 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY) -- Sunday
+               ELSE DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Other days
+             END AS check_date
+            )
+            
+            SELECT
+            IF(COUNT(1) > 0, 1, 0)
+            FROM live_chat_transcript
+            CROSS JOIN date_to_check
+            WHERE date = date_to_check.check_date
+      - duplicate_count(id) = 0:
           name: "Sjekker om tabellen inneholder duplikater"
 
   sf_sto_data.yaml: |
@@ -180,7 +201,7 @@ data:
             )
             
             SELECT
-            IF(COUNT(1) > 0, 1, 0) AS data_exists
+            IF(COUNT(1) > 0, 1, 0) 
             FROM sto_enhet
             CROSS JOIN date_to_check
             WHERE date = date_to_check.check_date
@@ -299,7 +320,7 @@ data:
             where q.PublishStatus <> 'Deleted'
 
   stillingsregistrering.yaml: |     
-    checks for stilling_agg_dag:
+    checks for stilling_annonser_agg_dag:
       - UpdatedOk > 0:
           name: "Sjekk om data fra i går eksisterer hvis i går var en hverdag. Ellers sjekk data fra fredag."
           UpdatedOk query: |
@@ -314,10 +335,31 @@ data:
             
             SELECT
             IF(COUNT(1) > 0, 1, 0)
-            FROM stilling_agg_dag
+            FROM stilling_annonser_agg_dag
             CROSS JOIN date_to_check
             WHERE dato = date_to_check.check_date
       - duplicate_count(dato) = 0:
+          name: "Sjekker om tabellen inneholder duplikater" 
+
+    checks for stilling_behandlinger_agg_dag:
+      - UpdatedOk > 0:
+          name: "Sjekk om data fra i går eksisterer hvis i går var en hverdag. Ellers sjekk data fra fredag."
+          UpdatedOk query: |
+            WITH date_to_check AS (
+              SELECT
+                CASE
+                  WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 2 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY) -- Monday
+                  WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 1 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY) -- Sunday
+                  ELSE DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Other days
+                END AS check_date
+            )
+            
+            SELECT
+            IF(COUNT(1) > 0, 1, 0)
+            FROM stilling_behandlinger_agg_dag
+            CROSS JOIN date_to_check
+            WHERE dato = date_to_check.check_date
+      - duplicate_count(dato,starttidspunkt) = 0:
           name: "Sjekker om tabellen inneholder duplikater" 
           
     checks for stilling_beholdning:
@@ -618,3 +660,60 @@ data:
           WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
       - duplicate_count(aar, maaned) = 0:
           name: "Sjekker om tabellen inneholder duplikater"
+          
+  tastevalg_agg_mnd.yaml: |     
+    checks for besvarte_per_fagmelding:
+      - UpdatedOk > 0:
+          name: "Sjekk om data fra i går eksisterer hvis i går var en hverdag. Ellers sjekk data fra fredag."
+          UpdatedOk query: |
+            WITH date_to_check AS (
+              SELECT
+                CASE
+                  WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 2 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY) -- Monday
+                  WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 1 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY) -- Sunday
+                  ELSE DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Other days
+                END AS check_date
+            )
+            
+            SELECT
+            IF(COUNT(1) > 0, 1, 0)
+            FROM besvarte_per_fagmelding
+            CROSS JOIN date_to_check
+            WHERE dato = date_to_check.check_date
+      - duplicate_count(dato, fagmelding) = 0:
+          name: "Sjekker om tabellen inneholder duplikater" 
+
+      checks for menyhendelser:
+      - UpdatedOk > 0:
+          name: "Sjekk om data fra i går eksisterer hvis i går var en hverdag. Ellers sjekk data fra fredag."
+          UpdatedOk query: |
+            WITH date_to_check AS (
+              SELECT
+                CASE
+                  WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 2 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY) -- Monday
+                  WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 1 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY) -- Sunday
+                  ELSE DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Other days
+                END AS check_date
+            )
+            
+            SELECT
+            IF(COUNT(1) > 0, 1, 0)
+            FROM menyhendelser
+            CROSS JOIN date_to_check
+            WHERE dato = date_to_check.check_date
+      - failed rows:
+          name: "Sjekker om tabellen inneholder duplikater"
+          fail query: |
+            with duplicated_records as (
+              SELECT dato, menu_key, menu_choice, count(*) 
+              FROM menyhendelser
+              group by dato, menu_key, menu_choice
+              having count(*) > 1
+            )
+            select
+              q.*
+            from menyhendelser q
+            join duplicated_records dup
+              on q.dato = dup.dato
+            and q.menu_key = dup.menu_key
+            and q.menu_choice = dup.menu_choice
