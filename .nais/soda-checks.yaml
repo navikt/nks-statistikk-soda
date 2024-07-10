@@ -4,13 +4,13 @@ metadata:
   name: soda-checks
   namespace: nks-statistikk
 data:
-  oppgavestatistikk.yaml: |  
+  oppgavestatistikk.yaml: |
     checks for nks_oppgave_dag_hist:
       - UpdatedOk > 0:
           name: "Sjekker om gårsdagens data er på plass"
           UpdatedOk query: |
-            SELECT 
-            IF(COUNT(1) > 0, 1, 0) 
+            SELECT
+            IF(COUNT(1) > 0, 1, 0)
             FROM nks_oppgave_dag_hist
             WHERE dato = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
 
@@ -18,39 +18,39 @@ data:
       - UpdatedOk > 0:
           name: "Sjekker om gårsdagens data er på plass"
           UpdatedOk query: |
-            SELECT 
+            SELECT
             IF(COUNT(1) > 0, 1, 0)
             FROM innsyn_oppgave_dag_hist
             WHERE dato = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
-  
-  boost_data.yaml: |    
+
+  boost_data.yaml: |
     checks for boost_chat_hour_raw:
       - UpdatedOk > 0:
           name: "Sjekker om gårsdagens data er på plass"
           UpdatedOk query: |
-            SELECT 
+            SELECT
             IF(COUNT(1) > 0, 1, 0)
             FROM boost_chat_hour_raw
             WHERE DATE(period) = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
       - duplicate_count(period) = 0:
           name: "Sjekker om tabellen inneholder duplikater"
-          
+
     checks for boost_chat_human_transfer_day_raw:
       - UpdatedOk > 0:
           name: "Sjekker om gårsdagens data er på plass"
           UpdatedOk query: |
-            SELECT 
+            SELECT
             IF(COUNT(1) > 0, 1, 0)
             FROM boost_chat_human_transfer_day_raw
             WHERE period = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
       - duplicate_count(period, transferred_to_human) = 0:
           name: "Sjekker om tabellen inneholder duplikater"
-          
+
     checks for boost_chat_intents_day_raw:
       - UpdatedOk > 0:
           name: "Sjekker om gårsdagens data er på plass"
           UpdatedOk query: |
-            SELECT 
+            SELECT
             IF(COUNT(1) > 0, 1, 0)
             FROM boost_chat_intents_day_raw
             WHERE period = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
@@ -66,7 +66,7 @@ data:
       - duplicate_count(period, id) = 0:
           name: "Sjekker om tabellen inneholder duplikater"
 
-  sf_chat_data.yaml: |        
+  sf_chat_data.yaml: |
     checks for chat_enhet:
       - UpdatedOk > 0:
           name: "Sjekk om data fra i går eksisterer hvis i går var en hverdag. Ellers sjekk data fra fredag."
@@ -79,7 +79,6 @@ data:
                ELSE DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Other days
              END AS check_date
             )
-            
             SELECT
             IF(COUNT(1) > 0, 1, 0)
             FROM chat_enhet
@@ -118,7 +117,6 @@ data:
                ELSE DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Other days
              END AS check_date
             )
-            
             SELECT
             IF(COUNT(1) > 0, 1, 0)
             FROM chat_kanalstatistikk
@@ -143,7 +141,7 @@ data:
             and q.queue = dup.queue
             and q.authentication_status = dup.authentication_status
             and q.language = dup.language
-          
+
     checks for chat_concurrency:
       - UpdatedOk > 0:
           name: "Sjekk om data fra i går eksisterer hvis i går var en hverdag. Ellers sjekk data fra fredag."
@@ -156,7 +154,6 @@ data:
                ELSE DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Other days
              END AS check_date
             )
-            
             SELECT
             IF(COUNT(1) > 0, 1, 0)
             FROM chat_concurrency
@@ -177,7 +174,6 @@ data:
                ELSE DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Other days
              END AS check_date
             )
-            
             SELECT
             IF(COUNT(1) > 0, 1, 0)
             FROM live_chat_transcript
@@ -199,9 +195,8 @@ data:
                ELSE DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Other days
              END AS check_date
             )
-            
             SELECT
-            IF(COUNT(1) > 0, 1, 0) 
+            IF(COUNT(1) > 0, 1, 0)
             FROM sto_enhet
             CROSS JOIN date_to_check
             WHERE date = date_to_check.check_date
@@ -251,7 +246,7 @@ data:
             and q.intervall = dup.intervall
             and q.queue = dup.queue
             and q.category = dup.category
-          
+
     checks for case_milestone:
       - UpdatedOk > 0:
           name: "Sjekker om gårsdagens data er på plass"
@@ -261,8 +256,8 @@ data:
             FROM case_milestone
             WHERE DATE(start_date) = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
       - duplicate_count(id) = 0:
-          name: "Sjekker om tabellen inneholder duplikater" 
-    
+          name: "Sjekker om tabellen inneholder duplikater"
+
     checks for sto_beholdning:
       - freshness(dato_tid) < 1d:
           name: "Sjekker om gårsdagens data er på plass"
@@ -282,7 +277,7 @@ data:
             WHERE Date = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
       - duplicate_count(KnowledgeArticleId, Date) = 0:
           name: "Sjekker om tabellen inneholder duplikater"
-          
+
     checks for kunnskapsartikler:
       - UpdatedOk > 0:
           name: "Sjekk om oppdatert i dag hvis i går var en hverdag. Ellers sjekk om oppdatert lørdag."
@@ -295,7 +290,6 @@ data:
                   ELSE CURRENT_DATE() -- Other days
                 END AS check_date
             )
-            
             SELECT
             IF(COUNT(1) > 0, 1, 0)
             FROM kunnskapsartikler
@@ -319,7 +313,7 @@ data:
             and q.VersionNumber = dup.VersionNumber
             where q.PublishStatus <> 'Deleted'
 
-  stillingsregistrering.yaml: |     
+  stillingsregistrering.yaml: |
     checks for stilling_annonser_agg_dag:
       - UpdatedOk > 0:
           name: "Sjekk om data fra i går eksisterer hvis i går var en hverdag. Ellers sjekk data fra fredag."
@@ -332,7 +326,6 @@ data:
                   ELSE DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Other days
                 END AS check_date
             )
-            
             SELECT
             IF(COUNT(1) > 0, 1, 0)
             FROM stilling_annonser_agg_dag
@@ -353,15 +346,14 @@ data:
                   ELSE DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Other days
                 END AS check_date
             )
-            
             SELECT
             IF(COUNT(1) > 0, 1, 0)
             FROM stilling_behandlinger_agg_dag
             CROSS JOIN date_to_check
             WHERE dato = date_to_check.check_date
       - duplicate_count(dato,starttidspunkt) = 0:
-          name: "Sjekker om tabellen inneholder duplikater" 
-          
+          name: "Sjekker om tabellen inneholder duplikater"
+
     checks for stilling_beholdning:
       - UpdatedOk > 0:
           name: "Sjekk om data fra i går eksisterer hvis i går var en hverdag. Ellers sjekk data fra fredag."
@@ -374,13 +366,12 @@ data:
                   ELSE DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Other days
                 END AS check_date
             )
-            
             SELECT
             IF(COUNT(1) > 0, 1, 0)
             FROM stilling_beholdning
             CROSS JOIN date_to_check
             WHERE DATE(last_updated_ts) = date_to_check.check_date
-            
+
   samtalereferat_data.yaml: |
     checks for topp_frekvens_intradag:
       - UpdatedOk > 0:
@@ -394,7 +385,6 @@ data:
                   ELSE DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Other days
                 END AS check_date
             )
-            
             SELECT
             IF(COUNT(1) > 0, 1, 0)
             FROM topp_frekvens_intradag
@@ -416,7 +406,7 @@ data:
               on q.dato = dup.dato
             and q.temagruppe = dup.temagruppe
             and q.topp_frekvens_ord = dup.topp_frekvens_ord
-          
+
     checks for topp_trend_intradag:
       - UpdatedOk > 0:
           name: "Sjekk om data fra i går eksisterer hvis i går var en hverdag. Ellers sjekk data fra fredag."
@@ -429,7 +419,6 @@ data:
                   ELSE DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Other days
                 END AS check_date
             )
-            
             SELECT
             IF(COUNT(1) > 0, 1, 0)
             FROM topp_trend_intradag
@@ -464,14 +453,13 @@ data:
                   ELSE DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Other days
                 END AS check_date
             )
-            
             SELECT
             IF(COUNT(1) > 0, 1, 0)
             FROM alle_nks_referater
             CROSS JOIN date_to_check
             WHERE DATE(crm_registered_datetime_formula__c) = date_to_check.check_date
       - duplicate_count(id) = 0:
-          name: "Sjekker om tabellen inneholder duplikater"  
+          name: "Sjekker om tabellen inneholder duplikater"
 
   tastevalg_agg_mnd.yaml: |
     checks for andre_familiehenvendelser:
@@ -486,7 +474,6 @@ data:
                 ELSE CURRENT_DATE() -- Other days
               END AS check_date
           )
-          
           SELECT
           IF(COUNT(1) > 0, 1, 0)
           FROM andre_familiehenvendelser
@@ -507,7 +494,6 @@ data:
                 ELSE CURRENT_DATE() -- Other days
               END AS check_date
           )
-          
           SELECT
           IF(COUNT(1) > 0, 1, 0)
           FROM arbeidsavklaringspenger
@@ -527,8 +513,7 @@ data:
                 WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 1 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Sunday
                 ELSE CURRENT_DATE() -- Other days
               END AS check_date
-          )
-          
+          ) 
           SELECT
           IF(COUNT(1) > 0, 1, 0)
           FROM barnebidrag
@@ -549,7 +534,6 @@ data:
                 ELSE CURRENT_DATE() -- Other days
               END AS check_date
           )
-          
           SELECT
           IF(COUNT(1) > 0, 1, 0)
           FROM barnebidrag_undermeny
@@ -568,7 +552,6 @@ data:
                 ELSE CURRENT_DATE() -- Other days
               END AS check_date
           )
-          
           SELECT
           IF(COUNT(1) > 0, 1, 0)
           FROM foreldrepenger
@@ -589,7 +572,6 @@ data:
                 ELSE CURRENT_DATE() -- Other days
               END AS check_date
           )
-          
           SELECT
           IF(COUNT(1) > 0, 1, 0)
           FROM jobbsoker
@@ -597,7 +579,7 @@ data:
           WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
       - duplicate_count(aar, maaned) = 0:
           name: "Sjekker om tabellen inneholder duplikater"
-    
+
     checks for pleiepenger:
       - UpdatedOk > 0:
           name: "Sjekk om oppdatert i dag hvis i går var en hverdag. Ellers sjekk om oppdatert lørdag."
@@ -610,7 +592,6 @@ data:
                 ELSE CURRENT_DATE() -- Other days
               END AS check_date
           )
-          
           SELECT
           IF(COUNT(1) > 0, 1, 0)
           FROM pleiepenger
@@ -631,7 +612,6 @@ data:
                 ELSE CURRENT_DATE() -- Other days
               END AS check_date
           )
-          
           SELECT
           IF(COUNT(1) > 0, 1, 0)
           FROM sykepenger
@@ -660,8 +640,8 @@ data:
           WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
       - duplicate_count(aar, maaned) = 0:
           name: "Sjekker om tabellen inneholder duplikater"
-          
-  tastevalg_agg_mnd.yaml: |     
+
+  tastevalg_agg_mnd.yaml: |
     checks for besvarte_per_fagmelding:
       - UpdatedOk > 0:
           name: "Sjekk om data fra i går eksisterer hvis i går var en hverdag. Ellers sjekk data fra fredag."
@@ -674,7 +654,6 @@ data:
                   ELSE DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Other days
                 END AS check_date
             )
-            
             SELECT
             IF(COUNT(1) > 0, 1, 0)
             FROM besvarte_per_fagmelding
@@ -695,7 +674,6 @@ data:
                   ELSE DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Other days
                 END AS check_date
             )
-            
             SELECT
             IF(COUNT(1) > 0, 1, 0)
             FROM menyhendelser
