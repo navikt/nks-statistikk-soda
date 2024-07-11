@@ -641,7 +641,7 @@ data:
       - duplicate_count(aar, maaned) = 0:
           name: "Sjekker om tabellen inneholder duplikater"
 
-  tastevalg_agg_mnd.yaml: |
+  tastevalg_agg_dag.yaml: |
     checks for besvarte_per_fagmelding:
       - UpdatedOk > 0:
           name: "Sjekk om data fra i går eksisterer hvis i går var en hverdag. Ellers sjekk data fra fredag."
