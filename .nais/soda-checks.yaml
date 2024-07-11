@@ -466,19 +466,19 @@ data:
       - UpdatedOk > 0:
           name: "Sjekk om oppdatert i dag hvis i går var en hverdag. Ellers sjekk om oppdatert lørdag."
           UpdatedOk query: |
-           WITH date_to_check AS (
+            WITH date_to_check AS (
+              SELECT
+                CASE
+                  WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 2 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY) -- Monday
+                  WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 1 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Sunday
+                  ELSE CURRENT_DATE() -- Other days
+                END AS check_date
+            )
             SELECT
-              CASE
-                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 2 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY) -- Monday
-                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 1 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Sunday
-                ELSE CURRENT_DATE() -- Other days
-              END AS check_date
-          )
-          SELECT
-          IF(COUNT(1) > 0, 1, 0)
-          FROM andre_familiehenvendelser
-          CROSS JOIN date_to_check
-          WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
+            IF(COUNT(1) > 0, 1, 0)
+            FROM andre_familiehenvendelser
+            CROSS JOIN date_to_check
+            WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
       - duplicate_count(aar, maaned) = 0:
           name: "Sjekker om tabellen inneholder duplikater" 
 
@@ -486,19 +486,19 @@ data:
       - UpdatedOk > 0:
           name: "Sjekk om oppdatert i dag hvis i går var en hverdag. Ellers sjekk om oppdatert lørdag."
           UpdatedOk query: |
-           WITH date_to_check AS (
+            WITH date_to_check AS (
+              SELECT
+                CASE
+                  WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 2 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY) -- Monday
+                  WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 1 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Sunday
+                  ELSE CURRENT_DATE() -- Other days
+                END AS check_date
+            )
             SELECT
-              CASE
-                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 2 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY) -- Monday
-                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 1 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Sunday
-                ELSE CURRENT_DATE() -- Other days
-              END AS check_date
-          )
-          SELECT
-          IF(COUNT(1) > 0, 1, 0)
-          FROM arbeidsavklaringspenger
-          CROSS JOIN date_to_check
-          WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
+            IF(COUNT(1) > 0, 1, 0)
+            FROM arbeidsavklaringspenger
+            CROSS JOIN date_to_check
+            WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
       - duplicate_count(aar, maaned) = 0:
           name: "Sjekker om tabellen inneholder duplikater"
 
@@ -506,19 +506,19 @@ data:
       - UpdatedOk > 0:
           name: "Sjekk om oppdatert i dag hvis i går var en hverdag. Ellers sjekk om oppdatert lørdag."
           UpdatedOk query: |
-           WITH date_to_check AS (
+            WITH date_to_check AS (
+              SELECT
+                CASE
+                  WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 2 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY) -- Monday
+                  WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 1 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Sunday
+                  ELSE CURRENT_DATE() -- Other days
+                END AS check_date
+            ) 
             SELECT
-              CASE
-                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 2 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY) -- Monday
-                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 1 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Sunday
-                ELSE CURRENT_DATE() -- Other days
-              END AS check_date
-          ) 
-          SELECT
-          IF(COUNT(1) > 0, 1, 0)
-          FROM barnebidrag
-          CROSS JOIN date_to_check
-          WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
+            IF(COUNT(1) > 0, 1, 0)
+            FROM barnebidrag
+            CROSS JOIN date_to_check
+            WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
       - duplicate_count(aar, maaned) = 0:
           name: "Sjekker om tabellen inneholder duplikater"
 
@@ -526,37 +526,37 @@ data:
       - UpdatedOk > 0:
           name: "Sjekk om oppdatert i dag hvis i går var en hverdag. Ellers sjekk om oppdatert lørdag."
           UpdatedOk query: |
-           WITH date_to_check AS (
+            WITH date_to_check AS (
+              SELECT
+                CASE
+                  WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 2 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY) -- Monday
+                  WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 1 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Sunday
+                  ELSE CURRENT_DATE() -- Other days
+                END AS check_date
+            )
             SELECT
-              CASE
-                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 2 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY) -- Monday
-                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 1 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Sunday
-                ELSE CURRENT_DATE() -- Other days
-              END AS check_date
-          )
-          SELECT
-          IF(COUNT(1) > 0, 1, 0)
-          FROM barnebidrag_undermeny
-          CROSS JOIN date_to_check
-          WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
+            IF(COUNT(1) > 0, 1, 0)
+            FROM barnebidrag_undermeny
+            CROSS JOIN date_to_check
+            WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
 
     checks for foreldrepenger:
       - UpdatedOk > 0:
           name: "Sjekk om oppdatert i dag hvis i går var en hverdag. Ellers sjekk om oppdatert lørdag."
           UpdatedOk query: |
-           WITH date_to_check AS (
+            WITH date_to_check AS (
+              SELECT
+                CASE
+                  WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 2 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY) -- Monday
+                  WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 1 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Sunday
+                  ELSE CURRENT_DATE() -- Other days
+                END AS check_date
+            )
             SELECT
-              CASE
-                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 2 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY) -- Monday
-                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 1 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Sunday
-                ELSE CURRENT_DATE() -- Other days
-              END AS check_date
-          )
-          SELECT
-          IF(COUNT(1) > 0, 1, 0)
-          FROM foreldrepenger
-          CROSS JOIN date_to_check
-          WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
+            IF(COUNT(1) > 0, 1, 0)
+            FROM foreldrepenger
+            CROSS JOIN date_to_check
+            WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
       - duplicate_count(aar, maaned) = 0:
           name: "Sjekker om tabellen inneholder duplikater"
 
@@ -564,19 +564,19 @@ data:
       - UpdatedOk > 0:
           name: "Sjekk om oppdatert i dag hvis i går var en hverdag. Ellers sjekk om oppdatert lørdag."
           UpdatedOk query: |
-           WITH date_to_check AS (
+            WITH date_to_check AS (
+              SELECT
+                CASE
+                  WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 2 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY) -- Monday
+                  WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 1 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Sunday
+                  ELSE CURRENT_DATE() -- Other days
+                END AS check_date
+            )
             SELECT
-              CASE
-                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 2 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY) -- Monday
-                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 1 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Sunday
-                ELSE CURRENT_DATE() -- Other days
-              END AS check_date
-          )
-          SELECT
-          IF(COUNT(1) > 0, 1, 0)
-          FROM jobbsoker
-          CROSS JOIN date_to_check
-          WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
+            IF(COUNT(1) > 0, 1, 0)
+            FROM jobbsoker
+            CROSS JOIN date_to_check
+            WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
       - duplicate_count(aar, maaned) = 0:
           name: "Sjekker om tabellen inneholder duplikater"
 
@@ -584,19 +584,19 @@ data:
       - UpdatedOk > 0:
           name: "Sjekk om oppdatert i dag hvis i går var en hverdag. Ellers sjekk om oppdatert lørdag."
           UpdatedOk query: |
-           WITH date_to_check AS (
+            WITH date_to_check AS (
+              SELECT
+                CASE
+                  WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 2 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY) -- Monday
+                  WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 1 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Sunday
+                  ELSE CURRENT_DATE() -- Other days
+                END AS check_date
+            )
             SELECT
-              CASE
-                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 2 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY) -- Monday
-                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 1 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Sunday
-                ELSE CURRENT_DATE() -- Other days
-              END AS check_date
-          )
-          SELECT
-          IF(COUNT(1) > 0, 1, 0)
-          FROM pleiepenger
-          CROSS JOIN date_to_check
-          WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
+            IF(COUNT(1) > 0, 1, 0)
+            FROM pleiepenger
+            CROSS JOIN date_to_check
+            WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
       - duplicate_count(aar, maaned) = 0:
           name: "Sjekker om tabellen inneholder duplikater"
 
@@ -604,19 +604,19 @@ data:
       - UpdatedOk > 0:
           name: "Sjekk om oppdatert i dag hvis i går var en hverdag. Ellers sjekk om oppdatert lørdag."
           UpdatedOk query: |
-           WITH date_to_check AS (
+            WITH date_to_check AS (
+              SELECT
+                CASE
+                  WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 2 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY) -- Monday
+                  WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 1 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Sunday
+                  ELSE CURRENT_DATE() -- Other days
+                END AS check_date
+            )
             SELECT
-              CASE
-                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 2 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY) -- Monday
-                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 1 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Sunday
-                ELSE CURRENT_DATE() -- Other days
-              END AS check_date
-          )
-          SELECT
-          IF(COUNT(1) > 0, 1, 0)
-          FROM sykepenger
-          CROSS JOIN date_to_check
-          WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
+            IF(COUNT(1) > 0, 1, 0)
+            FROM sykepenger
+            CROSS JOIN date_to_check
+            WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
       - duplicate_count(aar, maaned) = 0:
           name: "Sjekker om tabellen inneholder duplikater"
 
@@ -624,19 +624,19 @@ data:
       - UpdatedOk > 0:
           name: "Sjekk om oppdatert i dag hvis i går var en hverdag. Ellers sjekk om oppdatert lørdag."
           UpdatedOk query: |
-           WITH date_to_check AS (
+            WITH date_to_check AS (
+              SELECT
+                CASE
+                  WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 2 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY) -- Monday
+                  WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 1 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Sunday
+                  ELSE CURRENT_DATE() -- Other days
+                END AS check_date
+            )
             SELECT
-              CASE
-                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 2 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY) -- Monday
-                WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 1 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Sunday
-                ELSE CURRENT_DATE() -- Other days
-              END AS check_date
-          )
-          SELECT
-          IF(COUNT(1) > 0, 1, 0)
-          FROM uforetrygd
-          CROSS JOIN date_to_check
-          WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
+            IF(COUNT(1) > 0, 1, 0)
+            FROM uforetrygd
+            CROSS JOIN date_to_check
+            WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
       - duplicate_count(aar, maaned) = 0:
           name: "Sjekker om tabellen inneholder duplikater"
 
