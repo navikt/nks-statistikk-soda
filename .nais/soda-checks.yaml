@@ -632,7 +632,6 @@ data:
                 ELSE CURRENT_DATE() -- Other days
               END AS check_date
           )
-          
           SELECT
           IF(COUNT(1) > 0, 1, 0)
           FROM uforetrygd
