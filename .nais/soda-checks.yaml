@@ -351,7 +351,7 @@ data:
             FROM stilling_behandlinger_agg_dag
             CROSS JOIN date_to_check
             WHERE dato = date_to_check.check_date
-      - duplicate_count(dato,starttidspunkt) = 0:
+      - duplicate_count(dato, starttidspunkt) = 0:
           name: "Sjekker om tabellen inneholder duplikater"
 
     checks for stilling_beholdning:
