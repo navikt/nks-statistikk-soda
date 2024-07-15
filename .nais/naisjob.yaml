@@ -19,7 +19,7 @@ spec:
       value: /var/run/configmaps/soda-checks
     - name: SLACK_CHANNEL
       value: "#team-nks-statistikkoganalyse-soda"
-  schedule: '15 6 * * *'
+  schedule: '0 6 * * *'
   failedJobsHistoryLimit: 1
   successfulJobsHistoryLimit: 1
   backoffLimit: 1
