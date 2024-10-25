@@ -267,6 +267,28 @@ data:
           name: "Sjekker om gårsdagens data er på plass"
 
   sf_kunnskapsbase.yaml: |
+    checks for artikkelvisninger_logg:
+      - UpdatedOk > 0:
+          name: "Sjekker om gårsdagens data er på plass"
+          UpdatedOk query: |
+            SELECT 
+            IF(COUNT(1) > 0, 1, 0) 
+            FROM artikkelvisninger_logg
+            WHERE DATE(Viewed_date__c) = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
+      - duplicate_count(Id) = 0:
+          name: "Sjekker om tabellen inneholder duplikater"
+
+    checks for nyhetsvisninger_logg:
+      - UpdatedOk > 0:
+          name: "Sjekker om gårsdagens data er på plass"
+          UpdatedOk query: |
+            SELECT 
+            IF(COUNT(1) > 0, 1, 0) 
+            FROM nyhetsvisninger_logg
+            WHERE DATE(Viewed_date__c) = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
+      - duplicate_count(Id) = 0:
+          name: "Sjekker om tabellen inneholder duplikater"
+
     checks for artikkelvisninger_daglig_snapshot:
       - UpdatedOk > 0:
           name: "Sjekker om gårsdagens data er på plass"
