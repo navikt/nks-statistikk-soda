@@ -261,7 +261,8 @@ data:
     checks for sto_beholdning:
       - freshness(dato_tid) < 1d:
           name: "Sjekker om gårsdagens data er på plass"
-          
+  
+  sf_user.yaml: |        
     checks for user:
       - freshness(last_til_bq_ts) < 1d: 
           name: "Sjekker om gårsdagens data er på plass"
