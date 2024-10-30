@@ -41,7 +41,7 @@ data:
       type: bigquery
       project_id: nks-statistikk-prod-80c9
       dataset: tastevalg_agg_dag
-    data_source tastevalg_agg_dag:
+    data_source sf_user:
       type: bigquery
       project_id: nks-statistikk-prod-80c9
       dataset: sf_user
