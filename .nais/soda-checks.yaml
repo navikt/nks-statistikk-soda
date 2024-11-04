@@ -272,10 +272,19 @@ data:
       - UpdatedOk > 0:
           name: "Sjekker om gårsdagens data er på plass"
           UpdatedOk query: |
-            SELECT 
-            IF(COUNT(1) > 0, 1, 0) 
+            WITH date_to_check AS (
+             SELECT
+              CASE
+               WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 2 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY) -- Monday
+               WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 1 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY) -- Sunday
+               ELSE DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Other days
+             END AS check_date
+            )
+            SELECT
+            IF(COUNT(1) > 0, 1, 0)
             FROM artikkelvisninger_logg
-            WHERE DATE(Viewed_date__c) = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
+            CROSS JOIN date_to_check
+            WHERE DATE(Viewed_date__c) = date_to_check.check_date
       - duplicate_count(Id) = 0:
           name: "Sjekker om tabellen inneholder duplikater"
 
@@ -283,10 +292,19 @@ data:
       - UpdatedOk > 0:
           name: "Sjekker om gårsdagens data er på plass"
           UpdatedOk query: |
-            SELECT 
-            IF(COUNT(1) > 0, 1, 0) 
+            WITH date_to_check AS (
+             SELECT
+              CASE
+               WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 2 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY) -- Monday
+               WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 1 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY) -- Sunday
+               ELSE DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Other days
+             END AS check_date
+            )
+            SELECT
+            IF(COUNT(1) > 0, 1, 0)
             FROM nyhetsvisninger_logg
-            WHERE DATE(Viewed_date__c) = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
+            CROSS JOIN date_to_check
+            WHERE DATE(Viewed_date__c) = date_to_check.check_date
       - duplicate_count(Id) = 0:
           name: "Sjekker om tabellen inneholder duplikater"
 
