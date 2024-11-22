@@ -319,6 +319,10 @@ data:
       - duplicate_count(KnowledgeArticleId, Date) = 0:
           name: "Sjekker om tabellen inneholder duplikater"
 
+    checks for gjeldende_kunnskapsartikler:
+      - row_count > 800:
+          name: "Sjekker at antall artikler ikke er unormalt lavt"
+          
     checks for kunnskapsartikler:
       - UpdatedOk > 0:
           name: "Sjekk om oppdatert i dag hvis i går var en hverdag. Ellers sjekk om oppdatert lørdag."
