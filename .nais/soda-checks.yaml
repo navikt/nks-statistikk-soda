@@ -105,43 +105,6 @@ data:
             and q.language = dup.language
             and q.unit = dup.unit
 
-    checks for chat_kanalstatistikk:
-      - UpdatedOk > 0:
-          name: "Sjekk om data fra i går eksisterer hvis i går var en hverdag. Ellers sjekk data fra fredag."
-          UpdatedOk query: |
-            WITH date_to_check AS (
-             SELECT
-              CASE
-               WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 2 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY) -- Monday
-               WHEN EXTRACT(DAYOFWEEK FROM CURRENT_DATE()) = 1 THEN DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY) -- Sunday
-               ELSE DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY) -- Other days
-             END AS check_date
-            )
-            SELECT
-            IF(COUNT(1) > 0, 1, 0)
-            FROM chat_kanalstatistikk
-            CROSS JOIN date_to_check
-            WHERE date = date_to_check.check_date
-      - failed rows:
-          name: "Sjekker om tabellen inneholder duplikater"
-          fail query: |
-            with duplicated_records as (
-              select
-                date, `interval`, queue, authentication_status, language, count(*)
-              from chat_kanalstatistikk
-              group by date, `interval`, queue, authentication_status, language
-              having count(*) > 1
-            )
-            select
-              q.*
-            from chat_kanalstatistikk q
-            join duplicated_records dup
-              on q.date = dup.date
-            and q.interval = dup.interval
-            and q.queue = dup.queue
-            and q.authentication_status = dup.authentication_status
-            and q.language = dup.language
-
     checks for chat_concurrency:
       - UpdatedOk > 0:
           name: "Sjekk om data fra i går eksisterer hvis i går var en hverdag. Ellers sjekk data fra fredag."
