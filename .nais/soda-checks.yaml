@@ -654,3 +654,57 @@ data:
               on q.dato = dup.dato
             and q.menu_key = dup.menu_key
             and q.menu_choice = dup.menu_choice
+
+  innsikt_om_kanaler.yaml: |
+    checks for driftsmelding:
+      - UpdatedOk > 0:
+          name: "Sjekk om data fra forrige virkedag eksisterer."
+          UpdatedOk query: |
+            WITH date_to_check AS (
+              SELECT DATE(max(dato)) AS check_date
+              from felles_kodeverk.dim_tid
+              where virkedag_flagg = 1
+              and dato < CURRENT_DATE()
+            )
+            SELECT
+            IF(COUNT(1) > 0, 1, 0)
+            FROM innsikt_om_kanaler.driftsmelding
+            CROSS JOIN date_to_check
+            WHERE dato = date_to_check.check_date
+    
+    checks for innsikt_om_enheter:
+      - UpdatedOk > 0:
+          name: "Sjekker om gårsdagens data er på plass"
+          UpdatedOk query: |
+            SELECT 
+            IF(COUNT(1) > 0, 1, 0) 
+            FROM innsikt_om_enheter
+            WHERE dato = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
+          
+    checks for kanalstatistikk:
+      - UpdatedOk > 0:
+          name: "Sjekker om gårsdagens data er på plass"
+          UpdatedOk query: |
+            SELECT 
+            IF(COUNT(1) > 0, 1, 0) 
+            FROM kanalstatistikk
+            WHERE dato = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
+          
+  vergic.yaml: |
+    checks for case_summary:
+      - UpdatedOk > 0:
+          name: "Sjekk om data fra forrige virkedag eksisterer."
+          UpdatedOk query: |
+            WITH date_to_check AS (
+              SELECT DATE(max(dato)) AS check_date
+              from felles_kodeverk.dim_tid
+              where virkedag_flagg = 1
+              and dato < CURRENT_DATE()
+            )
+            SELECT
+            IF(COUNT(1) > 0, 1, 0)
+            FROM vergic.case_summary
+            CROSS JOIN date_to_check
+            WHERE DATE(created_at) = date_to_check.check_date
+      - duplicate_count(case_id) = 0:
+          name: "Sjekker om tabellen inneholder duplikater"
