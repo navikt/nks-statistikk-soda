@@ -6,7 +6,7 @@ metadata:
   name: nks-statistikk-soda
   namespace: nks-statistikk
 spec:
-  image: europe-north1-docker.pkg.dev/nais-management-233d/nada/nada-soda:2024.10.22-09.52-d489ef3
+  image: europe-north1-docker.pkg.dev/nais-management-233d/nada/nada-soda:2025.01.24-10.43-190fbf9
   accessPolicy:
     outbound:
       rules:
