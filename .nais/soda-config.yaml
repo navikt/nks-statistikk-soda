@@ -45,3 +45,11 @@ data:
       type: bigquery
       project_id: nks-statistikk-prod-80c9
       dataset: sf_user
+    data_source innsikt_om_kanaler:
+      type: bigquery
+      project_id: nks-statistikk-prod-80c9
+      dataset: innsikt_om_kanaler
+    data_source vergic:
+      type: bigquery
+      project_id: nks-statistikk-prod-80c9
+      dataset: vergic
