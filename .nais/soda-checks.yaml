@@ -674,12 +674,19 @@ data:
     
     checks for innsikt_om_enheter:
       - UpdatedOk > 0:
-          name: "Sjekker om gårsdagens data er på plass"
+          name: "Sjekk om data fra forrige virkedag eksisterer."
           UpdatedOk query: |
-            SELECT 
-            IF(COUNT(1) > 0, 1, 0) 
-            FROM innsikt_om_enheter
-            WHERE dato = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
+            WITH date_to_check AS (
+              SELECT DATE(max(dato)) AS check_date
+              from felles_kodeverk.dim_tid
+              where virkedag_flagg = 1
+              and dato < CURRENT_DATE()
+            )
+            SELECT
+            IF(COUNT(1) > 0, 1, 0)
+            FROM innsikt_om_kanaler.innsikt_om_enheter
+            CROSS JOIN date_to_check
+            WHERE dato = date_to_check.check_date
           
     checks for kanalstatistikk:
       - UpdatedOk > 0:
