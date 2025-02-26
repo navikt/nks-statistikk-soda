@@ -49,6 +49,10 @@ data:
       type: bigquery
       project_id: nks-statistikk-prod-80c9
       dataset: innsikt_om_kanaler
+    data_source innsikt_om_enheter:
+      type: bigquery
+      project_id: nks-statistikk-prod-80c9
+      dataset: innsikt_om_enheter
     data_source vergic:
       type: bigquery
       project_id: nks-statistikk-prod-80c9
