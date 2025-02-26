@@ -671,7 +671,17 @@ data:
             FROM innsikt_om_kanaler.driftsmelding
             CROSS JOIN date_to_check
             WHERE dato = date_to_check.check_date
-    
+          
+    checks for kanalstatistikk:
+      - UpdatedOk > 0:
+          name: "Sjekker om gårsdagens data er på plass"
+          UpdatedOk query: |
+            SELECT 
+            IF(COUNT(1) > 0, 1, 0) 
+            FROM kanalstatistikk
+            WHERE dato = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
+          
+  innsikt_om_enheter.yaml: |
     checks for innsikt_om_enheter:
       - UpdatedOk > 0:
           name: "Sjekk om data fra forrige virkedag eksisterer."
@@ -684,19 +694,10 @@ data:
             )
             SELECT
             IF(COUNT(1) > 0, 1, 0)
-            FROM innsikt_om_kanaler.innsikt_om_enheter
+            FROM innsikt_om_enheter.innsikt_om_enheter
             CROSS JOIN date_to_check
             WHERE dato = date_to_check.check_date
-          
-    checks for kanalstatistikk:
-      - UpdatedOk > 0:
-          name: "Sjekker om gårsdagens data er på plass"
-          UpdatedOk query: |
-            SELECT 
-            IF(COUNT(1) > 0, 1, 0) 
-            FROM kanalstatistikk
-            WHERE dato = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
-          
+      
   vergic.yaml: |
     checks for case_summary:
       - UpdatedOk > 0:
