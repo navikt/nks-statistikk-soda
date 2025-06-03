@@ -672,13 +672,13 @@ data:
             CROSS JOIN date_to_check
             WHERE dato = date_to_check.check_date
           
-    checks for kanalstatistikk:
+    checks for innsikt_om_kanaler:
       - UpdatedOk > 0:
           name: "Sjekker om gårsdagens data er på plass"
           UpdatedOk query: |
             SELECT 
             IF(COUNT(1) > 0, 1, 0) 
-            FROM kanalstatistikk
+            FROM innsikt_om_kanaler
             WHERE dato = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
           
   innsikt_om_enheter.yaml: |
