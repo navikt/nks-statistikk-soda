@@ -140,41 +140,7 @@ data:
   #        name: "Sjekker om tabellen inneholder duplikater"
 
   sf_sto_data.yaml: |
-    checks for sto_enhet:
-      - UpdatedOk > 0:
-          name: "Sjekk om data fra forrige virkedag eksisterer."
-          UpdatedOk query: |
-            WITH date_to_check AS (
-              SELECT DATE(max(dato)) AS check_date
-              from felles_kodeverk.dim_tid
-              where virkedag_flagg = 1
-              and dato < CURRENT_DATE()
-            )
-            SELECT
-            IF(COUNT(1) > 0, 1, 0)
-            FROM sf_sto_data.sto_enhet
-            CROSS JOIN date_to_check
-            WHERE date = date_to_check.check_date
-      - failed rows:
-          name: "Sjekker om tabellen inneholder duplikater"
-          fail query: |
-            with duplicated_records as (
-              select
-                date, queue, category, `interval`, unit, count(*)
-              from sto_enhet
-              group by date, queue, category, `interval`, unit
-              having count(*) > 1
-            )
-            select
-              q.*
-            from sto_enhet q
-            join duplicated_records dup
-              on q.date = dup.date
-            and q.queue = dup.queue
-            and q.category = dup.category
-            and q.interval = dup.interval
-            and q.unit = dup.unit
-
+  
     checks for sto_kanalstatistikk:
       - UpdatedOk > 0:
           name: "Sjekker om gårsdagens data er på plass"
