@@ -179,7 +179,7 @@ data:
       - duplicate_count(id) = 0:
           name: "Sjekker om tabellen inneholder duplikater"
 
-    checks for sto_beholdning:
+    checks for sto_beholdning_historikk:
       - freshness(dato) < 1d:
           name: "Sjekker om gårsdagens data er på plass"
   
