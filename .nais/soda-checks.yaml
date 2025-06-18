@@ -180,7 +180,7 @@ data:
           name: "Sjekker om tabellen inneholder duplikater"
 
     checks for sto_beholdning:
-      - freshness(dato_tid) < 1d:
+      - freshness(dato) < 1d:
           name: "Sjekker om gårsdagens data er på plass"
   
   sf_user.yaml: |        
