@@ -148,25 +148,25 @@ data:
             SELECT 
             IF(COUNT(1) > 0, 1, 0)
             FROM sto_kanalstatistikk
-            WHERE date = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
+            WHERE dato = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
       - failed rows:
           name: "Sjekker om tabellen inneholder duplikater"
           fail query: |
             with duplicated_records as (
               select
-                date, intervall, queue, category, count(*)
+                dato, intervall, ko, sto_eller_bto, count(*)
               from sto_kanalstatistikk
-              group by date, intervall, queue, category
+              group by dato, intervall, ko, sto_eller_bto
               having count(*) > 1
             )
             select
               q.*
             from sto_kanalstatistikk q
             join duplicated_records dup
-              on q.date = dup.date
+              on q.dato = dup.dato
             and q.intervall = dup.intervall
-            and q.queue = dup.queue
-            and q.category = dup.category
+            and q.ko = dup.ko
+            and q.sto_eller_bto = dup.sto_eller_bto
 
     checks for case_milestone:
       - UpdatedOk > 0:
