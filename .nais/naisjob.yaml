@@ -18,7 +18,7 @@ spec:
     - name: SODA_CHECKS_FOLDER
       value: /var/run/configmaps/soda-checks
     - name: SLACK_CHANNEL
-      value: "#team-nks-statistikkoganalyse-soda"
+      value: "#team-nks-statistikkoganalyse-alerts"
   schedule: '5 8 * * *'
   timeZone: Europe/Oslo
   failedJobsHistoryLimit: 1
