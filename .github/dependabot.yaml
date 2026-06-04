@@ -12,7 +12,13 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7
   - package-ecosystem: "docker"
+    registries:
+      - ghcr
     directory: "/"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7
