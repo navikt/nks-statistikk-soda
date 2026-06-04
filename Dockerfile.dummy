@@ -1,0 +1,1 @@
+FROM ghcr.io/navikt/nada-soda/soda:2026.05.08-06.40-a534ecd
