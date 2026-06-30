@@ -89,9 +89,9 @@ data:
                 id,
                 count(*)
 
-            from sf_chat_data.messaging_session 
-            group by id 
-            having count(*) > 1
+              from sf_chat_data.messaging_session 
+              group by id 
+              having count(*) > 1
 
   sf_sto_data.yaml: |
   
