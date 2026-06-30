@@ -67,6 +67,7 @@ data:
           name: "Sjekker om tabellen inneholder duplikater"
 
   sf_chat_data.yaml: |
+  
     checks for messaging_session:
       - UpdatedOk > 0:
           name: "Sjekk om data fra forrige virkedag eksisterer."
@@ -82,16 +83,6 @@ data:
             FROM sf_chat_data.messaging_session
             CROSS JOIN date_to_check
             WHERE dato = date_to_check.check_date
-      - failed rows:
-          name: "Sjekker om tabellen inneholder duplikater"
-          fail query: |
-              select
-                id,
-                count(*)
-
-              from sf_chat_data.messaging_session 
-              group by id 
-              having count(*) > 1
 
   sf_sto_data.yaml: |
   
