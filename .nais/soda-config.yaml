@@ -5,8 +5,8 @@ metadata:
   namespace: nks-statistikk
 data:
   config.yaml: |
-  type: bigquery
-  name: nks-statistikk-bigquery
-  connection:
-    use_context_auth: true
-    project_id: nks-statistikk-prod-80c9
+    type: bigquery
+    name: nks-statistikk-bigquery
+    connection:
+      use_context_auth: true
+      project_id: nks-statistikk-prod-80c9
