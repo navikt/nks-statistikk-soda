@@ -1,0 +1,13 @@
+dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/innsikt_om_kanaler/innsikt_om_kanaler
+
+checks:
+  - metric:
+      name: "Sjekker om gårsdagens data er på plass"
+      query: |
+        SELECT IF(COUNT(1) > 0, 1, 0)
+        FROM innsikt_om_kanaler.innsikt_om_kanaler
+        WHERE dato = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
+      threshold:
+        must_be_greater_than: 0
+
+columns: []

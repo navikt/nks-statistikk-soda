@@ -1,0 +1,11 @@
+dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/oppgavestatistikk/innsyn_oppgave_dag_hist
+
+filter: "dato = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)"
+
+checks:
+  - row_count:
+      name: "Sjekker om gårsdagens data er på plass"
+      threshold:
+        must_be_greater_than: 0
+
+columns: []

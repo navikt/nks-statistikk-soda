@@ -1,59 +1,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: soda-config
+  name: soda-config-contracts
   namespace: nks-statistikk
 data:
   config.yaml: |
-    data_source oppgavestatistikk:
-      type: bigquery
-      project_id: nks-statistikk-prod-80c9
-      dataset: oppgavestatistikk
-    data_source boost_data:
-      type: bigquery
-      project_id: nks-statistikk-prod-80c9
-      dataset: boost_data
-    data_source samtalereferat_data:
-      type: bigquery
-      project_id: nks-statistikk-prod-80c9
-      dataset: samtalereferat_data
-    data_source sf_chat_data:
-      type: bigquery
-      project_id: nks-statistikk-prod-80c9
-      dataset: sf_chat_data
-    data_source sf_sto_data:
-      type: bigquery
-      project_id: nks-statistikk-prod-80c9
-      dataset: sf_sto_data
-    data_source sf_kunnskapsbase:
-      type: bigquery
-      project_id: nks-statistikk-prod-80c9
-      dataset: sf_kunnskapsbase
-    data_source stillingsregistrering:
-      type: bigquery
-      project_id: nks-statistikk-prod-80c9
-      dataset: stillingsregistrering
-    data_source tastevalg_agg_mnd:
-      type: bigquery
-      project_id: nks-statistikk-prod-80c9
-      dataset: tastevalg_agg_mnd
-    data_source tastevalg_agg_dag:
-      type: bigquery
-      project_id: nks-statistikk-prod-80c9
-      dataset: tastevalg_agg_dag
-    data_source sf_user:
-      type: bigquery
-      project_id: nks-statistikk-prod-80c9
-      dataset: sf_user
-    data_source innsikt_om_kanaler:
-      type: bigquery
-      project_id: nks-statistikk-prod-80c9
-      dataset: innsikt_om_kanaler
-    data_source innsikt_om_enheter:
-      type: bigquery
-      project_id: nks-statistikk-prod-80c9
-      dataset: innsikt_om_enheter
-    data_source vergic:
-      type: bigquery
-      project_id: nks-statistikk-prod-80c9
-      dataset: vergic
+  type: bigquery
+  name: nks-statistikk-bigquery
+  connection:
+    use_context_auth: true
+    project_id: nks-statistikk-prod-80c9

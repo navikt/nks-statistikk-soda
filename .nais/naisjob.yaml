@@ -3,10 +3,10 @@ kind: Naisjob
 metadata:
   labels:
     team: nks-statistikk
-  name: nks-statistikk-soda
+  name: nks-statistikk-soda-contracts
   namespace: nks-statistikk
 spec:
-  image: europe-north1-docker.pkg.dev/nais-management-233d/nada/nada-soda:2026.06.08-07.12-e843429
+  image: europe-north1-docker.pkg.dev/nais-management-233d/nada/nada-soda-contracts:2026.06.26-07.45-17daf0b
   accessPolicy:
     outbound:
       rules:
@@ -14,11 +14,11 @@ spec:
           namespace: nada
   env:
     - name: SODA_CONFIG
-      value: /var/run/configmaps/soda-config/config.yaml
+      value: /var/run/configmaps/soda-config-contracts/config.yaml
     - name: SODA_CHECKS_FOLDER
-      value: /var/run/configmaps/soda-checks
+      value: /var/run/configmaps/soda-checks-contracts
     - name: SLACK_CHANNEL
-      value: "#team-nks-statistikkoganalyse-alerts"
+      value: "#team-nks-brukerinnsikt-data-alerts"
   schedule: '5 8 * * *'
   timeZone: Europe/Oslo
   failedJobsHistoryLimit: 1
@@ -26,15 +26,10 @@ spec:
   backoffLimit: 1
   concurrencyPolicy: Forbid
   filesFrom:
-    - configmap: soda-checks
-    - configmap: soda-config
+    - configmap: soda-checks-contracts
+    - configmap: soda-config-contracts
   gcp:
     permissions:
-    - resource:
-        apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
-        kind: Project
-        name: nks-statistikk-prod-80c9
-      role: roles/bigquery.readSessionUser
     - resource:
         apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
         kind: Project

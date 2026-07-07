@@ -1,0 +1,24 @@
+dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/samtalereferat_data/alle_nks_referater
+
+checks:
+  - metric:
+      name: "Sjekk om data fra forrige virkedag eksisterer."
+      query: |
+        WITH date_to_check AS (
+          SELECT DATE(MAX(dato)) AS check_date
+          FROM felles_kodeverk.dim_tid
+          WHERE virkedag_flagg = 1
+          AND dato < CURRENT_DATE()
+        )
+        SELECT IF(COUNT(1) > 0, 1, 0)
+        FROM samtalereferat_data.alle_nks_referater
+        CROSS JOIN date_to_check
+        WHERE DATE(crm_registered_datetime_formula__c) = date_to_check.check_date
+      threshold:
+        must_be_greater_than: 0
+
+columns:
+  - name: id
+    checks:
+      - duplicate:
+          name: "Sjekker om tabellen inneholder duplikater"

@@ -1,0 +1,16 @@
+dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/sf_sto_data/sto_kanalstatistikk
+
+checks:
+  - metric:
+      name: "Sjekker om gårsdagens data er på plass"
+      query: |
+        SELECT IF(COUNT(1) > 0, 1, 0)
+        FROM sf_sto_data.sto_kanalstatistikk
+        WHERE dato = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
+      threshold:
+        must_be_greater_than: 0
+  - duplicate:
+      name: "Sjekker om tabellen inneholder duplikater"
+      columns: ['dato', 'intervall', 'ko', 'sto_eller_bto']
+
+columns: []

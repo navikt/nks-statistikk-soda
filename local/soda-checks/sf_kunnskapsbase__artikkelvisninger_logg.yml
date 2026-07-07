@@ -1,0 +1,24 @@
+dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/sf_kunnskapsbase/artikkelvisninger_logg
+
+checks:
+  - metric:
+      name: "Sjekk om data fra forrige virkedag eksisterer."
+      query: |
+        WITH date_to_check AS (
+          SELECT DATE(MAX(dato)) AS check_date
+          FROM felles_kodeverk.dim_tid
+          WHERE virkedag_flagg = 1
+          AND dato < CURRENT_DATE()
+        )
+        SELECT IF(COUNT(1) > 0, 1, 0)
+        FROM sf_kunnskapsbase.artikkelvisninger_logg
+        CROSS JOIN date_to_check
+        WHERE DATE(Viewed_date__c) = date_to_check.check_date
+      threshold:
+        must_be_greater_than: 0
+
+columns:
+  - name: Id
+    checks:
+      - duplicate:
+          name: "Sjekker om tabellen inneholder duplikater"

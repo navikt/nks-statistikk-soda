@@ -1,0 +1,29 @@
+dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/boost_data/boost_chat_intents_day_raw
+
+checks:
+  - metric:
+      name: "Sjekker om gårsdagens data er på plass"
+      qualifier: c1
+      query: |
+        SELECT IF(COUNT(1) > 0, 1, 0)
+        FROM boost_data.boost_chat_intents_day_raw
+        WHERE period = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
+      threshold:
+        must_be_greater_than: 0
+  - metric:
+      name: "Sjekker om det er mange manglende root intents"
+      qualifier: c2
+      query: |
+        SELECT COUNT(*)
+        FROM boost_data.boost_chat_intents_day_raw i
+        LEFT JOIN boost_data.root_intent_mapping r
+        ON i.intent_title = r.intent
+        WHERE period = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
+        AND r.root_intent IS NULL
+      threshold:
+        must_be_less_than: 5
+  - duplicate:
+      name: "Sjekker om tabellen inneholder duplikater"
+      columns: ['period', 'id']
+
+columns: []

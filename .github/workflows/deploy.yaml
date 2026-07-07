@@ -2,7 +2,9 @@ name: build, push and deploy
 on: 
   push:
     branches:
-      - 'main'
+      - 'v4'
+    paths-ignore:
+      - 'Dockerfile.dummy'
 
 jobs:
   deploy:
