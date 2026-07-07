@@ -6,7 +6,7 @@ metadata:
   name: nks-statistikk-soda-contracts
   namespace: nks-statistikk
 spec:
-  image: europe-north1-docker.pkg.dev/nais-management-233d/nada/nada-soda-contracts:2026.06.26-07.45-17daf0b
+  image: europe-north1-docker.pkg.dev/nais-management-233d/nada/nada-soda-contracts:2026.06.26-08.53-e2166bc
   accessPolicy:
     outbound:
       rules:
@@ -19,7 +19,6 @@ spec:
       value: /var/run/configmaps/soda-checks-contracts
     - name: SLACK_CHANNEL
       value: "#team-nks-brukerinnsikt-data-alerts"
-  schedule: '5 8 * * *'
   timeZone: Europe/Oslo
   failedJobsHistoryLimit: 1
   successfulJobsHistoryLimit: 1
