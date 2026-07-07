@@ -695,9 +695,9 @@ data:
             WHERE dato = date_to_check.check_date
           threshold:
             must_be_greater_than: 0
-        - duplicate:
-            name: "Sjekker om tabellen inneholder duplikater"
-            columns: ['dato', 'menu_key', 'menu_choice']
+      - duplicate:
+          name: "Sjekker om tabellen inneholder duplikater"
+          columns: ['dato', 'menu_key', 'menu_choice']
 
     columns: []
 
