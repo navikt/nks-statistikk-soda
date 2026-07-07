@@ -1,629 +1,787 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: soda-checks
+  name: soda-checks-contracts
   namespace: nks-statistikk
 data:
-  oppgavestatistikk.yaml: |
-    checks for nks_oppgave_dag_hist:
-      - UpdatedOk > 0:
-          name: "Sjekker om gårsdagens data er på plass"
-          UpdatedOk query: |
-            SELECT
-            IF(COUNT(1) > 0, 1, 0)
-            FROM nks_oppgave_dag_hist
-            WHERE dato = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
+  oppgavestatistikk__nks_oppgave_dag_hist.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/oppgavestatistikk/nks_oppgave_dag_hist
 
-    checks for innsyn_oppgave_dag_hist:
-      - UpdatedOk > 0:
-          name: "Sjekker om gårsdagens data er på plass"
-          UpdatedOk query: |
-            SELECT
-            IF(COUNT(1) > 0, 1, 0)
-            FROM innsyn_oppgave_dag_hist
-            WHERE dato = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
+    filter: "dato = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)"
 
-  boost_data.yaml: |
-    checks for boost_chat_hour_raw:
-      - UpdatedOk > 0:
+    checks:
+      - row_count:
           name: "Sjekker om gårsdagens data er på plass"
-          UpdatedOk query: |
-            SELECT
-            IF(COUNT(1) > 0, 1, 0)
-            FROM boost_chat_hour_raw
+          threshold:
+            must_be_greater_than: 0
+
+    columns: []
+
+  oppgavestatistikk__innsyn_oppgave_dag_hist.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/oppgavestatistikk/innsyn_oppgave_dag_hist
+
+    filter: "dato = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)"
+
+    checks:
+      - row_count:
+          name: "Sjekker om gårsdagens data er på plass"
+          threshold:
+            must_be_greater_than: 0
+
+    columns: []
+  
+  boost_data__boost_chat_hour_raw.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/boost_data/boost_chat_hour_raw
+
+    checks:
+      - metric:
+          name: "Sjekker om gårsdagens data er på plass"
+          query: |
+            SELECT IF(COUNT(1) > 0, 1, 0)
+            FROM boost_data.boost_chat_hour_raw
             WHERE DATE(period) = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
-      - duplicate_count(period) = 0:
-          name: "Sjekker om tabellen inneholder duplikater"
+          threshold:
+            must_be_greater_than: 0
 
-    checks for boost_chat_human_transfer_day_raw:
-      - UpdatedOk > 0:
-          name: "Sjekker om gårsdagens data er på plass"
-          UpdatedOk query: |
-            SELECT
-            IF(COUNT(1) > 0, 1, 0)
-            FROM boost_chat_human_transfer_day_raw
-            WHERE period = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
-      - duplicate_count(period, transferred_to_human) = 0:
-          name: "Sjekker om tabellen inneholder duplikater"
+    columns:
+      - name: period
+        checks:
+          - duplicate:
+              name: "Sjekker om tabellen inneholder duplikater"
 
-    checks for boost_chat_intents_day_raw:
-      - UpdatedOk > 0:
+  boost_data__boost_chat_human_transfer_day_raw.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/boost_data/boost_chat_human_transfer_day_raw
+
+    checks:
+      - metric:
           name: "Sjekker om gårsdagens data er på plass"
-          UpdatedOk query: |
-            SELECT
-            IF(COUNT(1) > 0, 1, 0)
-            FROM boost_chat_intents_day_raw
+          query: |
+            SELECT IF(COUNT(1) > 0, 1, 0)
+            FROM boost_data.boost_chat_human_transfer_day_raw
             WHERE period = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
-      - UnknownRoot < 5:
+          threshold:
+            must_be_greater_than: 0
+      - duplicate:
+          name: "Sjekker om tabellen inneholder duplikater"
+          columns: ['period', 'transferred_to_human']
+
+    columns: []
+  
+  boost_data__boost_chat_intents_day_raw.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/boost_data/boost_chat_intents_day_raw
+
+    checks:
+      - metric:
+          name: "Sjekker om gårsdagens data er på plass"
+          qualifier: c1
+          query: |
+            SELECT IF(COUNT(1) > 0, 1, 0)
+            FROM boost_data.boost_chat_intents_day_raw
+            WHERE period = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
+          threshold:
+            must_be_greater_than: 0
+      - metric:
           name: "Sjekker om det er mange manglende root intents"
-          UnknownRoot query: |
-            SELECT count(*)
-            FROM boost_chat_intents_day_raw i
-            LEFT JOIN root_intent_mapping r
+          qualifier: c2
+          query: |
+            SELECT COUNT(*)
+            FROM boost_data.boost_chat_intents_day_raw i
+            LEFT JOIN boost_data.root_intent_mapping r
             ON i.intent_title = r.intent
             WHERE period = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
-            AND r.root_intent is NULL
-      - duplicate_count(period, id) = 0:
+            AND r.root_intent IS NULL
+          threshold:
+            must_be_less_than: 5
+      - duplicate:
           name: "Sjekker om tabellen inneholder duplikater"
+          columns: ['period', 'id']
 
-  sf_chat_data.yaml: |
-  
-    checks for messaging_session:
-      - UpdatedOk > 0:
-          name: "Sjekk om data fra forrige virkedag eksisterer."
-          UpdatedOk query: |
+    columns: []
+
+  sf_chat_data__messaging_session.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/sf_chat_data/messaging_session
+
+    checks:
+      - metric:
+          name: "Sjekk om data fra forrige virkedag eksisterer"
+          query: |
             WITH date_to_check AS (
-              SELECT DATE(max(dato)) AS check_date
-              from felles_kodeverk.dim_tid
-              where virkedag_flagg = 1
-              and dato < CURRENT_DATE()
+              SELECT DATE(MAX(dato)) AS check_date
+              FROM felles_kodeverk.dim_tid
+              WHERE virkedag_flagg = 1
+              AND dato < CURRENT_DATE()
             )
-            SELECT
-            IF(COUNT(1) > 0, 1, 0)
+            SELECT IF(COUNT(1) > 0, 1, 0)
             FROM sf_chat_data.messaging_session
             CROSS JOIN date_to_check
             WHERE dato = date_to_check.check_date
+          threshold:
+            must_be_greater_than: 0
 
-  sf_sto_data.yaml: |
+    columns: []
   
-    checks for sto_kanalstatistikk:
-      - UpdatedOk > 0:
+  sf_sto_data__sto_kanalstatistikk.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/sf_sto_data/sto_kanalstatistikk
+
+    checks:
+      - metric:
           name: "Sjekker om gårsdagens data er på plass"
-          UpdatedOk query: |
-            SELECT 
-            IF(COUNT(1) > 0, 1, 0)
-            FROM sto_kanalstatistikk
+          query: |
+            SELECT IF(COUNT(1) > 0, 1, 0)
+            FROM sf_sto_data.sto_kanalstatistikk
             WHERE dato = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
-      - failed rows:
+          threshold:
+            must_be_greater_than: 0
+      - duplicate:
           name: "Sjekker om tabellen inneholder duplikater"
-          fail query: |
-            with duplicated_records as (
-              select
-                dato, intervall, ko, sto_eller_bto, count(*)
-              from sto_kanalstatistikk
-              group by dato, intervall, ko, sto_eller_bto
-              having count(*) > 1
-            )
-            select
-              q.*
-            from sto_kanalstatistikk q
-            join duplicated_records dup
-              on q.dato = dup.dato
-            and q.intervall = dup.intervall
-            and q.ko = dup.ko
-            and q.sto_eller_bto = dup.sto_eller_bto
+          columns: ['dato', 'intervall', 'ko', 'sto_eller_bto']
 
-    checks for case_milestone:
-      - UpdatedOk > 0:
+    columns: []
+
+  sf_sto_data__case_milestone.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/sf_sto_data/case_milestone
+
+    checks:
+      - metric:
           name: "Sjekker om gårsdagens data er på plass"
-          UpdatedOk query: |
-            SELECT 
-            IF(COUNT(1) > 0, 1, 0) 
-            FROM case_milestone
+          query: |
+            SELECT IF(COUNT(1) > 0, 1, 0)
+            FROM sf_sto_data.case_milestone
             WHERE DATE(start_date) = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
-      - duplicate_count(id) = 0:
-          name: "Sjekker om tabellen inneholder duplikater"
+          threshold:
+            must_be_greater_than: 0
 
-    checks for sto_beholdning_historikk:
-      - freshness(dato) < 1d:
+    columns:
+      - name: id
+        checks:
+          - duplicate:
+              name: "Sjekker om tabellen inneholder duplikater"
+
+  sf_sto_data__sto_beholdning_historikk.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/sf_sto_data/sto_beholdning_historikk
+
+    checks:
+      - freshness:
           name: "Sjekker om gårsdagens data er på plass"
+          column: dato
+          threshold:
+            unit: day
+            must_be_less_than: 1
+
+    columns: []
+
+  sf_user__user.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/sf_user/user
+
+    checks:
+      - freshness:
+          name: "Sjekker om gårsdagens data er på plass"
+          column: last_til_bq_ts
+          threshold:
+            unit: day
+            must_be_less_than: 1
+
+    columns: []
   
-  sf_user.yaml: |        
-    checks for user:
-      - freshness(last_til_bq_ts) < 1d: 
-          name: "Sjekker om gårsdagens data er på plass"
+  sf_kunnskapsbase__artikkelvisninger_logg.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/sf_kunnskapsbase/artikkelvisninger_logg
 
-  sf_kunnskapsbase.yaml: |
-    checks for artikkelvisninger_logg:
-      - UpdatedOk > 0:
+    checks:
+      - metric:
           name: "Sjekk om data fra forrige virkedag eksisterer."
-          UpdatedOk query: |
+          query: |
             WITH date_to_check AS (
-              SELECT DATE(max(dato)) AS check_date
-              from felles_kodeverk.dim_tid
-              where virkedag_flagg = 1
-              and dato < CURRENT_DATE()
+              SELECT DATE(MAX(dato)) AS check_date
+              FROM felles_kodeverk.dim_tid
+              WHERE virkedag_flagg = 1
+              AND dato < CURRENT_DATE()
             )
-            SELECT
-            IF(COUNT(1) > 0, 1, 0)
+            SELECT IF(COUNT(1) > 0, 1, 0)
             FROM sf_kunnskapsbase.artikkelvisninger_logg
             CROSS JOIN date_to_check
             WHERE DATE(Viewed_date__c) = date_to_check.check_date
-      - duplicate_count(Id) = 0:
-          name: "Sjekker om tabellen inneholder duplikater"
+          threshold:
+            must_be_greater_than: 0
 
-    checks for nyhetsvisninger_logg:
-      - UpdatedOk > 0:
+    columns:
+      - name: Id
+        checks:
+          - duplicate:
+              name: "Sjekker om tabellen inneholder duplikater"
+
+  sf_kunnskapsbase__nyhetsvisninger_logg.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/sf_kunnskapsbase/nyhetsvisninger_logg
+
+    checks:
+      - metric:
           name: "Sjekk om data fra forrige virkedag eksisterer."
-          UpdatedOk query: |
+          query: |
             WITH date_to_check AS (
-              SELECT DATE(max(dato)) AS check_date
-              from felles_kodeverk.dim_tid
-              where virkedag_flagg = 1
-              and dato < CURRENT_DATE()
+              SELECT DATE(MAX(dato)) AS check_date
+              FROM felles_kodeverk.dim_tid
+              WHERE virkedag_flagg = 1
+              AND dato < CURRENT_DATE()
             )
-            SELECT
-            IF(COUNT(1) > 0, 1, 0)
+            SELECT IF(COUNT(1) > 0, 1, 0)
             FROM sf_kunnskapsbase.nyhetsvisninger_logg
             CROSS JOIN date_to_check
             WHERE DATE(Viewed_date__c) = date_to_check.check_date
-      - duplicate_count(Id) = 0:
-          name: "Sjekker om tabellen inneholder duplikater"
+          threshold:
+            must_be_greater_than: 0
 
-    checks for artikkelvisninger_daglig_snapshot:
-      - UpdatedOk > 0:
+    columns:
+      - name: Id
+        checks:
+          - duplicate:
+              name: "Sjekker om tabellen inneholder duplikater"
+
+  sf_kunnskapsbase__artikkelvisninger_daglig_snapshot.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/sf_kunnskapsbase/artikkelvisninger_daglig_snapshot
+
+    checks:
+      - metric:
           name: "Sjekker om gårsdagens data er på plass"
-          UpdatedOk query: |
-            SELECT 
-            IF(COUNT(1) > 0, 1, 0) 
-            FROM artikkelvisninger_daglig_snapshot
+          query: |
+            SELECT IF(COUNT(1) > 0, 1, 0)
+            FROM sf_kunnskapsbase.artikkelvisninger_daglig_snapshot
             WHERE Date = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
-      - duplicate_count(KnowledgeArticleId, Date) = 0:
+          threshold:
+            must_be_greater_than: 0
+      - duplicate:
           name: "Sjekker om tabellen inneholder duplikater"
+          columns: ['KnowledgeArticleId', 'Date']
 
-    checks for gjeldende_kunnskapsartikler:
-      - row_count > 800:
+    columns: []
+
+  sf_kunnskapsbase__gjeldende_kunnskapsartikler.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/sf_kunnskapsbase/gjeldende_kunnskapsartikler
+
+    checks:
+      - metric:
           name: "Sjekker at antall artikler ikke er unormalt lavt"
-          
-    checks for kunnskapsartikler:
-      - UpdatedOk > 0:
+          query: |
+            SELECT COUNT(*)
+            FROM sf_kunnskapsbase.gjeldende_kunnskapsartikler
+          threshold:
+            must_be_greater_than: 800
+
+    columns: []
+
+  sf_kunnskapsbase__kunnskapsartikler.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/sf_kunnskapsbase/kunnskapsartikler
+
+    checks:
+      - metric:
           name: "Sjekk om oppdatert dagen etter forrige virkedag."
-          UpdatedOk query: |
+          query: |
             WITH date_to_check AS (
-              SELECT DATE_ADD(DATE(max(dato)), INTERVAL 1 DAY)  AS check_date
-              from felles_kodeverk.dim_tid
-              where virkedag_flagg = 1
-              and dato < CURRENT_DATE() 
+              SELECT DATE_ADD(DATE(MAX(dato)), INTERVAL 1 DAY) AS check_date
+              FROM felles_kodeverk.dim_tid
+              WHERE virkedag_flagg = 1
+              AND dato < CURRENT_DATE()
             )
-            SELECT
-            IF(COUNT(1) > 0, 1, 0)
-            FROM kunnskapsartikler
+            SELECT IF(COUNT(1) > 0, 1, 0)
+            FROM sf_kunnskapsbase.kunnskapsartikler
             CROSS JOIN date_to_check
             WHERE DATE(load_to_bq_ts) = date_to_check.check_date
-      - failed rows:
+          threshold:
+            must_be_greater_than: 0
+      - failed_rows:
           name: "Sjekker om tabellen inneholder duplikater"
-          fail query: |
-            with duplicated_records as (
-              SELECT KnowledgeArticleId, VersionNumber, count(*) 
-              FROM kunnskapsartikler
-              where PublishStatus <> 'Deleted'
-              group by KnowledgeArticleId, VersionNumber 
-              having count(*) > 1
+          query: |
+            WITH duplicated_records AS (
+              SELECT KnowledgeArticleId, VersionNumber
+              FROM sf_kunnskapsbase.kunnskapsartikler
+              WHERE PublishStatus <> 'Deleted'
+              GROUP BY KnowledgeArticleId, VersionNumber
+              HAVING COUNT(*) > 1
             )
-            select
-              q.*
-            from kunnskapsartikler q
-            join duplicated_records dup
-              on q.KnowledgeArticleId = dup.KnowledgeArticleId
-            and q.VersionNumber = dup.VersionNumber
-            where q.PublishStatus <> 'Deleted'
+            SELECT q.*
+            FROM sf_kunnskapsbase.kunnskapsartikler q
+            JOIN duplicated_records dup
+              ON q.KnowledgeArticleId = dup.KnowledgeArticleId
+              AND q.VersionNumber = dup.VersionNumber
+            WHERE q.PublishStatus <> 'Deleted'
 
-  stillingsregistrering.yaml: |
-    checks for stilling_annonser_agg_dag:
-      - UpdatedOk > 0:
+    columns: []
+
+  stillingsregistrering__stilling_annonser_agg_dag.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/stillingsregistrering/stilling_annonser_agg_dag
+
+    checks:
+      - metric:
           name: "Sjekk om data fra forrige virkedag eksisterer."
-          UpdatedOk query: |
+          query: |
             WITH date_to_check AS (
-              SELECT DATE(max(dato)) AS check_date
-              from felles_kodeverk.dim_tid
-              where virkedag_flagg = 1
-              and dato < CURRENT_DATE()
+              SELECT DATE(MAX(dato)) AS check_date
+              FROM felles_kodeverk.dim_tid
+              WHERE virkedag_flagg = 1
+              AND dato < CURRENT_DATE()
             )
-            SELECT
-            IF(COUNT(1) > 0, 1, 0)
+            SELECT IF(COUNT(1) > 0, 1, 0)
             FROM stillingsregistrering.stilling_annonser_agg_dag
             CROSS JOIN date_to_check
             WHERE dato = date_to_check.check_date
-      - duplicate_count(dato) = 0:
-          name: "Sjekker om tabellen inneholder duplikater" 
+          threshold:
+            must_be_greater_than: 0
 
-    checks for stilling_behandlinger_agg_dag:
-      - UpdatedOk > 0:
+    columns:
+      - name: dato
+        checks:
+          - duplicate:
+              name: "Sjekker om tabellen inneholder duplikater"
+
+  stillingsregistrering__stilling_behandlinger_agg_dag.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/stillingsregistrering/stilling_behandlinger_agg_dag
+
+    checks:
+      - metric:
           name: "Sjekk om data fra forrige virkedag eksisterer."
-          UpdatedOk query: |
+          query: |
             WITH date_to_check AS (
-              SELECT DATE(max(dato)) AS check_date
-              from felles_kodeverk.dim_tid
-              where virkedag_flagg = 1
-              and dato < CURRENT_DATE()
+              SELECT DATE(MAX(dato)) AS check_date
+              FROM felles_kodeverk.dim_tid
+              WHERE virkedag_flagg = 1
+              AND dato < CURRENT_DATE()
             )
-            SELECT
-            IF(COUNT(1) > 0, 1, 0)
+            SELECT IF(COUNT(1) > 0, 1, 0)
             FROM stillingsregistrering.stilling_behandlinger_agg_dag
             CROSS JOIN date_to_check
             WHERE dato = date_to_check.check_date
-      - duplicate_count(dato, starttidspunkt) = 0:
+          threshold:
+            must_be_greater_than: 0
+      - duplicate:
           name: "Sjekker om tabellen inneholder duplikater"
+          columns: ['dato', 'starttidspunkt']
 
-    checks for stilling_beholdning:
-      - UpdatedOk > 0:
+    columns: []
+
+  stillingsregistrering__stilling_beholdning.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/stillingsregistrering/stilling_beholdning
+
+    checks:
+      - metric:
           name: "Sjekk om data fra forrige virkedag eksisterer."
-          UpdatedOk query: |
+          query: |
             WITH date_to_check AS (
-              SELECT DATE(max(dato)) AS check_date
-              from felles_kodeverk.dim_tid
-              where virkedag_flagg = 1
-              and dato < CURRENT_DATE()
+              SELECT DATE(MAX(dato)) AS check_date
+              FROM felles_kodeverk.dim_tid
+              WHERE virkedag_flagg = 1
+              AND dato < CURRENT_DATE()
             )
-            SELECT
-            IF(COUNT(1) > 0, 1, 0)
+            SELECT IF(COUNT(1) > 0, 1, 0)
             FROM stillingsregistrering.stilling_beholdning
             CROSS JOIN date_to_check
             WHERE DATE(last_updated_ts) = date_to_check.check_date
+          threshold:
+            must_be_greater_than: 0
 
-  samtalereferat_data.yaml: |
-    checks for topp_frekvens_intradag:
-      - UpdatedOk > 0:
+    columns: []
+
+  samtalereferat_data__topp_frekvens_intradag.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/samtalereferat_data/topp_frekvens_intradag
+
+    checks:
+      - metric:
           name: "Sjekk om data fra forrige virkedag eksisterer."
-          UpdatedOk query: |
+          query: |
             WITH date_to_check AS (
-              SELECT DATE(max(dato)) AS check_date
-              from felles_kodeverk.dim_tid
-              where virkedag_flagg = 1
-              and dato < CURRENT_DATE()
+              SELECT DATE(MAX(dato)) AS check_date
+              FROM felles_kodeverk.dim_tid
+              WHERE virkedag_flagg = 1
+              AND dato < CURRENT_DATE()
             )
-            SELECT
-            IF(COUNT(1) > 0, 1, 0)
+            SELECT IF(COUNT(1) > 0, 1, 0)
             FROM samtalereferat_data.topp_frekvens_intradag
             CROSS JOIN date_to_check
             WHERE dato = date_to_check.check_date
-      - failed rows:
+          threshold:
+            must_be_greater_than: 0
+      - duplicate:
           name: "Sjekker om tabellen inneholder duplikater"
-          fail query: |
-            with duplicated_records as (
-              SELECT dato, temagruppe, topp_frekvens_ord, count(*) 
-              FROM topp_frekvens_intradag
-              group by dato, temagruppe, topp_frekvens_ord
-              having count(*) > 1
-            )
-            select
-              q.*
-            from topp_frekvens_intradag q
-            join duplicated_records dup
-              on q.dato = dup.dato
-            and q.temagruppe = dup.temagruppe
-            and q.topp_frekvens_ord = dup.topp_frekvens_ord
+          columns: ['dato', 'temagruppe', 'topp_frekvens_ord']
 
-    checks for topp_trend_intradag:
-      - UpdatedOk > 0:
+    columns: []
+
+  samtalereferat_data__topp_trend_intradag.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/samtalereferat_data/topp_trend_intradag
+
+    checks:
+      - metric:
           name: "Sjekk om data fra forrige virkedag eksisterer."
-          UpdatedOk query: |
+          query: |
             WITH date_to_check AS (
-              SELECT DATE(max(dato)) AS check_date
-              from felles_kodeverk.dim_tid
-              where virkedag_flagg = 1
-              and dato < CURRENT_DATE()
+              SELECT DATE(MAX(dato)) AS check_date
+              FROM felles_kodeverk.dim_tid
+              WHERE virkedag_flagg = 1
+              AND dato < CURRENT_DATE()
             )
-            SELECT
-            IF(COUNT(1) > 0, 1, 0)
+            SELECT IF(COUNT(1) > 0, 1, 0)
             FROM samtalereferat_data.topp_trend_intradag
             CROSS JOIN date_to_check
             WHERE dato = date_to_check.check_date
-      - failed rows:
+          threshold:
+            must_be_greater_than: 0
+      - duplicate:
           name: "Sjekker om tabellen inneholder duplikater"
-          fail query: |
-            with duplicated_records as (
-              SELECT dato, temagruppe, topp_trending_ord, count(*) 
-              FROM topp_trend_intradag
-              group by dato, temagruppe, topp_trending_ord
-              having count(*) > 1
-            )
-            select
-              q.*
-            from topp_trend_intradag q
-            join duplicated_records dup
-              on q.dato = dup.dato
-            and q.temagruppe = dup.temagruppe
-            and q.topp_trending_ord = dup.topp_trending_ord
+          columns: ['dato', 'temagruppe', 'topp_trending_ord']
 
-    checks for alle_nks_referater:
-      - UpdatedOk > 0:
+    columns: []
+
+  samtalereferat_data__alle_nks_referater.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/samtalereferat_data/alle_nks_referater
+
+    checks:
+      - metric:
           name: "Sjekk om data fra forrige virkedag eksisterer."
-          UpdatedOk query: |
+          query: |
             WITH date_to_check AS (
-              SELECT DATE(max(dato)) AS check_date
-              from felles_kodeverk.dim_tid
-              where virkedag_flagg = 1
-              and dato < CURRENT_DATE()
+              SELECT DATE(MAX(dato)) AS check_date
+              FROM felles_kodeverk.dim_tid
+              WHERE virkedag_flagg = 1
+              AND dato < CURRENT_DATE()
             )
-            SELECT
-            IF(COUNT(1) > 0, 1, 0)
+            SELECT IF(COUNT(1) > 0, 1, 0)
             FROM samtalereferat_data.alle_nks_referater
             CROSS JOIN date_to_check
             WHERE DATE(crm_registered_datetime_formula__c) = date_to_check.check_date
-      - duplicate_count(id) = 0:
-          name: "Sjekker om tabellen inneholder duplikater"
+          threshold:
+            must_be_greater_than: 0
 
-  tastevalg_agg_mnd.yaml: |
-    checks for andre_familiehenvendelser:
-      - UpdatedOk > 0:
+    columns:
+      - name: id
+        checks:
+          - duplicate:
+              name: "Sjekker om tabellen inneholder duplikater"
+
+  tastevalg_agg_mnd__andre_familiehenvendelser.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/tastevalg_agg_mnd/andre_familiehenvendelser
+
+    checks:
+      - metric:
           name: "Sjekk om oppdatert dagen etter forrige virkedag."
-          UpdatedOk query: |
+          query: |
             WITH date_to_check AS (
-              SELECT DATE_ADD(DATE(max(dato)), INTERVAL 1 DAY)  AS check_date
-              from felles_kodeverk.dim_tid
-              where virkedag_flagg = 1
-              and dato < CURRENT_DATE()  
+              SELECT DATE_ADD(DATE(MAX(dato)), INTERVAL 1 DAY) AS check_date
+              FROM felles_kodeverk.dim_tid
+              WHERE virkedag_flagg = 1
+              AND dato < CURRENT_DATE()
             )
-            SELECT
-            IF(COUNT(1) > 0, 1, 0)
+            SELECT IF(COUNT(1) > 0, 1, 0)
             FROM tastevalg_agg_mnd.andre_familiehenvendelser
             CROSS JOIN date_to_check
             WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
-      - duplicate_count(aar, maaned) = 0:
-          name: "Sjekker om tabellen inneholder duplikater" 
+          threshold:
+            must_be_greater_than: 0
+      - duplicate:
+          name: "Sjekker om tabellen inneholder duplikater"
+          columns: ['aar', 'maaned']
 
-    checks for arbeidsavklaringspenger:
-      - UpdatedOk > 0:
+    columns: []
+
+  tastevalg_agg_mnd__arbeidsavklaringspenger.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/tastevalg_agg_mnd/arbeidsavklaringspenger
+
+    checks:
+      - metric:
           name: "Sjekk om oppdatert dagen etter forrige virkedag."
-          UpdatedOk query: |
+          query: |
             WITH date_to_check AS (
-              SELECT DATE_ADD(DATE(max(dato)), INTERVAL 1 DAY)  AS check_date
-              from felles_kodeverk.dim_tid
-              where virkedag_flagg = 1
-              and dato < CURRENT_DATE()  
+              SELECT DATE_ADD(DATE(MAX(dato)), INTERVAL 1 DAY) AS check_date
+              FROM felles_kodeverk.dim_tid
+              WHERE virkedag_flagg = 1
+              AND dato < CURRENT_DATE()
             )
-            SELECT
-            IF(COUNT(1) > 0, 1, 0)
+            SELECT IF(COUNT(1) > 0, 1, 0)
             FROM tastevalg_agg_mnd.arbeidsavklaringspenger
             CROSS JOIN date_to_check
             WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
-      - duplicate_count(aar, maaned) = 0:
+          threshold:
+            must_be_greater_than: 0
+      - duplicate:
           name: "Sjekker om tabellen inneholder duplikater"
+          columns: ['aar', 'maaned']
 
-    checks for barnebidrag:
-      - UpdatedOk > 0:
+    columns: []
+  
+  tastevalg_agg_mnd__barnebidrag.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/tastevalg_agg_mnd/barnebidrag
+
+    checks:
+      - metric:
           name: "Sjekk om oppdatert dagen etter forrige virkedag."
-          UpdatedOk query: |
+          query: |
             WITH date_to_check AS (
-              SELECT DATE_ADD(DATE(max(dato)), INTERVAL 1 DAY)  AS check_date
-              from felles_kodeverk.dim_tid
-              where virkedag_flagg = 1
-              and dato < CURRENT_DATE()  
-            ) 
-            SELECT
-            IF(COUNT(1) > 0, 1, 0)
+              SELECT DATE_ADD(DATE(MAX(dato)), INTERVAL 1 DAY) AS check_date
+              FROM felles_kodeverk.dim_tid
+              WHERE virkedag_flagg = 1
+              AND dato < CURRENT_DATE()
+            )
+            SELECT IF(COUNT(1) > 0, 1, 0)
             FROM tastevalg_agg_mnd.barnebidrag
             CROSS JOIN date_to_check
             WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
-      - duplicate_count(aar, maaned) = 0:
+          threshold:
+            must_be_greater_than: 0
+      - duplicate:
           name: "Sjekker om tabellen inneholder duplikater"
+          columns: ['aar', 'maaned']
 
-    checks for barnebidrag_undermeny:
-      - UpdatedOk > 0:
+    columns: []
+
+  tastevalg_agg_mnd__barnebidrag_undermeny.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/tastevalg_agg_mnd/barnebidrag_undermeny
+
+    checks:
+      - metric:
           name: "Sjekk om oppdatert dagen etter forrige virkedag."
-          UpdatedOk query: |
+          query: |
             WITH date_to_check AS (
-              SELECT DATE_ADD(DATE(max(dato)), INTERVAL 1 DAY)  AS check_date
-              from felles_kodeverk.dim_tid
-              where virkedag_flagg = 1
-              and dato < CURRENT_DATE()  
+              SELECT DATE_ADD(DATE(MAX(dato)), INTERVAL 1 DAY) AS check_date
+              FROM felles_kodeverk.dim_tid
+              WHERE virkedag_flagg = 1
+              AND dato < CURRENT_DATE()
             )
-            SELECT
-            IF(COUNT(1) > 0, 1, 0)
+            SELECT IF(COUNT(1) > 0, 1, 0)
             FROM tastevalg_agg_mnd.barnebidrag_undermeny
             CROSS JOIN date_to_check
             WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
+          threshold:
+            must_be_greater_than: 0
 
-    checks for foreldrepenger:
-      - UpdatedOk > 0:
+    columns: []
+
+  tastevalg_agg_mnd__foreldrepenger.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/tastevalg_agg_mnd/foreldrepenger
+
+    checks:
+      - metric:
           name: "Sjekk om oppdatert dagen etter forrige virkedag."
-          UpdatedOk query: |
+          query: |
             WITH date_to_check AS (
-              SELECT DATE_ADD(DATE(max(dato)), INTERVAL 1 DAY)  AS check_date
-              from felles_kodeverk.dim_tid
-              where virkedag_flagg = 1
-              and dato < CURRENT_DATE()  
+              SELECT DATE_ADD(DATE(MAX(dato)), INTERVAL 1 DAY) AS check_date
+              FROM felles_kodeverk.dim_tid
+              WHERE virkedag_flagg = 1
+              AND dato < CURRENT_DATE()
             )
-            SELECT
-            IF(COUNT(1) > 0, 1, 0)
+            SELECT IF(COUNT(1) > 0, 1, 0)
             FROM tastevalg_agg_mnd.foreldrepenger
             CROSS JOIN date_to_check
             WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
-      - duplicate_count(aar, maaned) = 0:
+          threshold:
+            must_be_greater_than: 0
+      - duplicate:
           name: "Sjekker om tabellen inneholder duplikater"
+          columns: ['aar', 'maaned']
 
-    checks for jobbsoker:
-      - UpdatedOk > 0:
+    columns: []
+
+  tastevalg_agg_mnd__jobbsoker.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/tastevalg_agg_mnd/jobbsoker
+
+    checks:
+      - metric:
           name: "Sjekk om oppdatert dagen etter forrige virkedag."
-          UpdatedOk query: |
+          query: |
             WITH date_to_check AS (
-              SELECT DATE_ADD(DATE(max(dato)), INTERVAL 1 DAY)  AS check_date
-              from felles_kodeverk.dim_tid
-              where virkedag_flagg = 1
-              and dato < CURRENT_DATE()  
+              SELECT DATE_ADD(DATE(MAX(dato)), INTERVAL 1 DAY) AS check_date
+              FROM felles_kodeverk.dim_tid
+              WHERE virkedag_flagg = 1
+              AND dato < CURRENT_DATE()
             )
-            SELECT
-            IF(COUNT(1) > 0, 1, 0)
+            SELECT IF(COUNT(1) > 0, 1, 0)
             FROM tastevalg_agg_mnd.jobbsoker
             CROSS JOIN date_to_check
             WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
-      - duplicate_count(aar, maaned) = 0:
+          threshold:
+            must_be_greater_than: 0
+      - duplicate:
           name: "Sjekker om tabellen inneholder duplikater"
+          columns: ['aar', 'maaned']
 
-    checks for pleiepenger:
-      - UpdatedOk > 0:
+    columns: []
+
+  tastevalg_agg_mnd__pleiepenger.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/tastevalg_agg_mnd/pleiepenger
+
+    checks:
+      - metric:
           name: "Sjekk om oppdatert dagen etter forrige virkedag."
-          UpdatedOk query: |
+          query: |
             WITH date_to_check AS (
-              SELECT DATE_ADD(DATE(max(dato)), INTERVAL 1 DAY)  AS check_date
-              from felles_kodeverk.dim_tid
-              where virkedag_flagg = 1
-              and dato < CURRENT_DATE()  
+              SELECT DATE_ADD(DATE(MAX(dato)), INTERVAL 1 DAY) AS check_date
+              FROM felles_kodeverk.dim_tid
+              WHERE virkedag_flagg = 1
+              AND dato < CURRENT_DATE()
             )
-            SELECT
-            IF(COUNT(1) > 0, 1, 0)
+            SELECT IF(COUNT(1) > 0, 1, 0)
             FROM tastevalg_agg_mnd.pleiepenger
             CROSS JOIN date_to_check
             WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
-      - duplicate_count(aar, maaned) = 0:
+          threshold:
+            must_be_greater_than: 0
+      - duplicate:
           name: "Sjekker om tabellen inneholder duplikater"
+          columns: ['aar', 'maaned']
 
-    checks for sykepenger:
-      - UpdatedOk > 0:
+    columns: []
+  
+  tastevalg_agg_mnd__sykepenger.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/tastevalg_agg_mnd/sykepenger
+
+    checks:
+      - metric:
           name: "Sjekk om oppdatert dagen etter forrige virkedag."
-          UpdatedOk query: |
+          query: |
             WITH date_to_check AS (
-              SELECT DATE_ADD(DATE(max(dato)), INTERVAL 1 DAY)  AS check_date
-              from felles_kodeverk.dim_tid
-              where virkedag_flagg = 1
-              and dato < CURRENT_DATE()  
+              SELECT DATE_ADD(DATE(MAX(dato)), INTERVAL 1 DAY) AS check_date
+              FROM felles_kodeverk.dim_tid
+              WHERE virkedag_flagg = 1
+              AND dato < CURRENT_DATE()
             )
-            SELECT
-            IF(COUNT(1) > 0, 1, 0)
+            SELECT IF(COUNT(1) > 0, 1, 0)
             FROM tastevalg_agg_mnd.sykepenger
             CROSS JOIN date_to_check
             WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
-      - duplicate_count(aar, maaned) = 0:
+          threshold:
+            must_be_greater_than: 0
+      - duplicate:
           name: "Sjekker om tabellen inneholder duplikater"
+          columns: ['aar', 'maaned']
 
-    checks for uforetrygd:
-      - UpdatedOk > 0:
+    columns: []
+
+  tastevalg_agg_mnd__uforetrygd.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/tastevalg_agg_mnd/uforetrygd
+
+    checks:
+      - metric:
           name: "Sjekk om oppdatert dagen etter forrige virkedag."
-          UpdatedOk query: |
+          query: |
             WITH date_to_check AS (
-              SELECT DATE_ADD(DATE(max(dato)), INTERVAL 1 DAY)  AS check_date
-              from felles_kodeverk.dim_tid
-              where virkedag_flagg = 1
-              and dato < CURRENT_DATE()  
+              SELECT DATE_ADD(DATE(MAX(dato)), INTERVAL 1 DAY) AS check_date
+              FROM felles_kodeverk.dim_tid
+              WHERE virkedag_flagg = 1
+              AND dato < CURRENT_DATE()
             )
-            SELECT
-            IF(COUNT(1) > 0, 1, 0)
+            SELECT IF(COUNT(1) > 0, 1, 0)
             FROM tastevalg_agg_mnd.uforetrygd
             CROSS JOIN date_to_check
             WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
-      - duplicate_count(aar, maaned) = 0:
+          threshold:
+            must_be_greater_than: 0
+      - duplicate:
           name: "Sjekker om tabellen inneholder duplikater"
+          columns: ['aar', 'maaned']
 
-  tastevalg_agg_dag.yaml: |
-    #checks for besvarte_per_fagmelding:
-    #  - UpdatedOk > 0:
-    #      name: "Sjekk om data fra forrige virkedag eksisterer."
-    #      UpdatedOk query: |
-    #        WITH date_to_check AS ( 
-    #          SELECT DATE(max(dato)) AS check_date
-    #          from felles_kodeverk.dim_tid
-    #          where virkedag_flagg = 1
-    #          and dato < CURRENT_DATE()
-    #        )
-    #        SELECT
-    #        IF(COUNT(1) > 0, 1, 0)
-    #        FROM tastevalg_agg_dag.besvarte_per_fagmelding
-    #        CROSS JOIN date_to_check
-    #        WHERE dato = date_to_check.check_date
-    #  - duplicate_count(dato, fagmelding) = 0:
-    #      name: "Sjekker om tabellen inneholder duplikater" 
-    #
-    checks for menyhendelser:
-      - UpdatedOk > 0:
+    columns: []
+
+  tastevalg_agg_dag__menyhendelser.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/tastevalg_agg_dag/menyhendelser
+
+    checks:
+      - metric:
           name: "Sjekk om data fra forrige virkedag eksisterer."
-          UpdatedOk query: |
+          query: |
             WITH date_to_check AS (
-              SELECT DATE(max(dato)) AS check_date
-              from felles_kodeverk.dim_tid
-              where virkedag_flagg = 1
-              and dato < CURRENT_DATE()
+              SELECT DATE(MAX(dato)) AS check_date
+              FROM felles_kodeverk.dim_tid
+              WHERE virkedag_flagg = 1
+              AND dato < CURRENT_DATE()
             )
-            SELECT
-            IF(COUNT(1) > 0, 1, 0)
+            SELECT IF(COUNT(1) > 0, 1, 0)
             FROM tastevalg_agg_dag.menyhendelser
             CROSS JOIN date_to_check
             WHERE dato = date_to_check.check_date
-      - failed rows:
+          threshold:
+            must_be_greater_than: 0
+      - duplicate:
           name: "Sjekker om tabellen inneholder duplikater"
-          fail query: |
-            with duplicated_records as (
-              SELECT dato, menu_key, menu_choice, count(*) 
-              FROM menyhendelser
-              group by dato, menu_key, menu_choice
-              having count(*) > 1
-            )
-            select
-              q.*
-            from menyhendelser q
-            join duplicated_records dup
-              on q.dato = dup.dato
-            and q.menu_key = dup.menu_key
-            and q.menu_choice = dup.menu_choice
+          columns: ['dato', 'menu_key', 'menu_choice']
 
-  innsikt_om_kanaler.yaml: |
-    checks for driftsmelding:
-      - UpdatedOk > 0:
+    columns: []
+
+  innsikt_om_kanaler__driftsmelding.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/innsikt_om_kanaler/driftsmelding
+
+    checks:
+      - metric:
           name: "Sjekk om data fra forrige virkedag eksisterer."
-          UpdatedOk query: |
+          query: |
             WITH date_to_check AS (
-              SELECT DATE(max(dato)) AS check_date
-              from felles_kodeverk.dim_tid
-              where virkedag_flagg = 1
-              and dato < CURRENT_DATE()
+              SELECT DATE(MAX(dato)) AS check_date
+              FROM felles_kodeverk.dim_tid
+              WHERE virkedag_flagg = 1
+              AND dato < CURRENT_DATE()
             )
-            SELECT
-            IF(COUNT(1) > 0, 1, 0)
+            SELECT IF(COUNT(1) > 0, 1, 0)
             FROM innsikt_om_kanaler.driftsmelding
             CROSS JOIN date_to_check
             WHERE dato = date_to_check.check_date
-          
-    checks for innsikt_om_kanaler:
-      - UpdatedOk > 0:
+          threshold:
+            must_be_greater_than: 0
+
+    columns: []
+
+  innsikt_om_kanaler__innsikt_om_kanaler.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/innsikt_om_kanaler/innsikt_om_kanaler
+
+    checks:
+      - metric:
           name: "Sjekker om gårsdagens data er på plass"
-          UpdatedOk query: |
-            SELECT 
-            IF(COUNT(1) > 0, 1, 0) 
-            FROM innsikt_om_kanaler
+          query: |
+            SELECT IF(COUNT(1) > 0, 1, 0)
+            FROM innsikt_om_kanaler.innsikt_om_kanaler
             WHERE dato = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
-          
-  innsikt_om_enheter.yaml: |
-    checks for innsikt_om_enheter:
-      - UpdatedOk > 0:
+          threshold:
+            must_be_greater_than: 0
+
+    columns: []
+
+  innsikt_om_enheter__innsikt_om_enheter.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/innsikt_om_enheter/innsikt_om_enheter
+
+    checks:
+      - metric:
           name: "Sjekk om data fra forrige virkedag eksisterer."
-          UpdatedOk query: |
+          query: |
             WITH date_to_check AS (
-              SELECT DATE(max(dato)) AS check_date
-              from felles_kodeverk.dim_tid
-              where virkedag_flagg = 1
-              and dato < CURRENT_DATE()
+              SELECT DATE(MAX(dato)) AS check_date
+              FROM felles_kodeverk.dim_tid
+              WHERE virkedag_flagg = 1
+              AND dato < CURRENT_DATE()
             )
-            SELECT
-            IF(COUNT(1) > 0, 1, 0)
+            SELECT IF(COUNT(1) > 0, 1, 0)
             FROM innsikt_om_enheter.innsikt_om_enheter
             CROSS JOIN date_to_check
             WHERE dato = date_to_check.check_date
-      
-  vergic.yaml: |
-    checks for case_summary:
-      - UpdatedOk > 0:
+          threshold:
+            must_be_greater_than: 0
+
+    columns: []
+
+  vergic__case_summary.yaml: |
+    dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/vergic/case_summary
+
+    checks:
+      - metric:
           name: "Sjekk om data fra forrige virkedag eksisterer."
-          UpdatedOk query: |
+          query: |
             WITH date_to_check AS (
-              SELECT DATE(max(dato)) AS check_date
-              from felles_kodeverk.dim_tid
-              where virkedag_flagg = 1
-              and dato < CURRENT_DATE()
+              SELECT DATE(MAX(dato)) AS check_date
+              FROM felles_kodeverk.dim_tid
+              WHERE virkedag_flagg = 1
+              AND dato < CURRENT_DATE()
             )
-            SELECT
-            IF(COUNT(1) > 0, 1, 0)
+            SELECT IF(COUNT(1) > 0, 1, 0)
             FROM vergic.case_summary
             CROSS JOIN date_to_check
             WHERE DATE(created_at) = date_to_check.check_date
-      - duplicate_count(case_id) = 0:
-          name: "Sjekker om tabellen inneholder duplikater"
+          threshold:
+            must_be_greater_than: 0
+
+    columns:
+      - name: case_id
+        checks:
+          - duplicate:
+              name: "Sjekker om tabellen inneholder duplikater"

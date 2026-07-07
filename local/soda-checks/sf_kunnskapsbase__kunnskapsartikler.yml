@@ -1,0 +1,36 @@
+dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/sf_kunnskapsbase/kunnskapsartikler
+
+checks:
+  - metric:
+      name: "Sjekk om oppdatert dagen etter forrige virkedag."
+      query: |
+        WITH date_to_check AS (
+          SELECT DATE_ADD(DATE(MAX(dato)), INTERVAL 1 DAY) AS check_date
+          FROM felles_kodeverk.dim_tid
+          WHERE virkedag_flagg = 1
+          AND dato < CURRENT_DATE()
+        )
+        SELECT IF(COUNT(1) > 0, 1, 0)
+        FROM sf_kunnskapsbase.kunnskapsartikler
+        CROSS JOIN date_to_check
+        WHERE DATE(load_to_bq_ts) = date_to_check.check_date
+      threshold:
+        must_be_greater_than: 0
+  - failed_rows:
+      name: "Sjekker om tabellen inneholder duplikater"
+      query: |
+        WITH duplicated_records AS (
+          SELECT KnowledgeArticleId, VersionNumber
+          FROM sf_kunnskapsbase.kunnskapsartikler
+          WHERE PublishStatus <> 'Deleted'
+          GROUP BY KnowledgeArticleId, VersionNumber
+          HAVING COUNT(*) > 1
+        )
+        SELECT q.*
+        FROM sf_kunnskapsbase.kunnskapsartikler q
+        JOIN duplicated_records dup
+          ON q.KnowledgeArticleId = dup.KnowledgeArticleId
+          AND q.VersionNumber = dup.VersionNumber
+        WHERE q.PublishStatus <> 'Deleted'
+
+columns: []

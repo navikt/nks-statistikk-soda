@@ -1,0 +1,23 @@
+dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/tastevalg_agg_mnd/andre_familiehenvendelser
+
+checks:
+  - metric:
+      name: "Sjekk om oppdatert dagen etter forrige virkedag."
+      query: |
+        WITH date_to_check AS (
+          SELECT DATE_ADD(DATE(MAX(dato)), INTERVAL 1 DAY) AS check_date
+          FROM felles_kodeverk.dim_tid
+          WHERE virkedag_flagg = 1
+          AND dato < CURRENT_DATE()
+        )
+        SELECT IF(COUNT(1) > 0, 1, 0)
+        FROM tastevalg_agg_mnd.andre_familiehenvendelser
+        CROSS JOIN date_to_check
+        WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
+      threshold:
+        must_be_greater_than: 0
+  - duplicate:
+      name: "Sjekker om tabellen inneholder duplikater"
+      columns: ['aar', 'maaned']
+
+columns: []

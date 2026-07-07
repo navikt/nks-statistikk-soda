@@ -1,5 +1,5 @@
-data_source oppgavestatistikk:
-  type: bigquery
+type: bigquery
+name: nks-statistikk-bigquery
+connection:
   project_id: nks-statistikk-prod-80c9
-  dataset: oppgavestatistikk
   use_context_auth: True

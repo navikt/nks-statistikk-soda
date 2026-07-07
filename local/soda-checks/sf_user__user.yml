@@ -1,0 +1,11 @@
+dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/sf_user/user
+
+checks:
+  - freshness:
+      name: "Sjekker om gårsdagens data er på plass"
+      column: last_til_bq_ts
+      threshold:
+        unit: day
+        must_be_less_than: 1
+
+columns: []

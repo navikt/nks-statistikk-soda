@@ -1,0 +1,20 @@
+dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/innsikt_om_enheter/innsikt_om_enheter
+
+checks:
+  - metric:
+      name: "Sjekk om data fra forrige virkedag eksisterer."
+      query: |
+        WITH date_to_check AS (
+          SELECT DATE(MAX(dato)) AS check_date
+          FROM felles_kodeverk.dim_tid
+          WHERE virkedag_flagg = 1
+          AND dato < CURRENT_DATE()
+        )
+        SELECT IF(COUNT(1) > 0, 1, 0)
+        FROM innsikt_om_enheter.innsikt_om_enheter
+        CROSS JOIN date_to_check
+        WHERE dato = date_to_check.check_date
+      threshold:
+        must_be_greater_than: 0
+
+columns: []

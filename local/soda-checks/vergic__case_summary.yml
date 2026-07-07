@@ -1,0 +1,23 @@
+dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/vergic/case_summary
+
+checks:
+  - metric:
+      name: "Sjekk om data fra forrige virkedag eksisterer."
+      query: |
+        WITH date_to_check AS (
+          SELECT DATE(MAX(dato)) AS check_date
+          FROM felles_kodeverk.dim_tid
+          WHERE virkedag_flagg = 1
+          AND dato < CURRENT_DATE()
+        )
+        SELECT IF(COUNT(1) > 0, 1, 0)
+        FROM vergic.case_summary
+        CROSS JOIN date_to_check
+        WHERE DATE(created_at) = date_to_check.check_date
+      threshold:
+        must_be_greater_than: 0
+  columns:
+  - name: case_id
+    checks:
+      - duplicate:
+          name: "Sjekker om tabellen inneholder duplikater"

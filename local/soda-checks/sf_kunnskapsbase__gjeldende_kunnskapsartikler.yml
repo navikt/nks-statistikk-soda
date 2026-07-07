@@ -1,0 +1,9 @@
+dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/sf_kunnskapsbase/gjeldende_kunnskapsartikler
+
+checks:
+  - row_count:
+      name: "Sjekker at antall artikler ikke er unormalt lavt"
+      threshold:
+        must_be_greater_than: 800
+
+columns: []

@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - 'main'
+    paths-ignore:
+      - 'Dockerfile.dummy'
 
 jobs:
   deploy:
@@ -11,7 +13,7 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Deploy to prod-gcp
         uses: nais/deploy/actions/deploy@v2
         env:
