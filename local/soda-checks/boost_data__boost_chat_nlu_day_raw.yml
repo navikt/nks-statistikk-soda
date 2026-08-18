@@ -1,0 +1,17 @@
+dataset: nks-statistikk-bigquery/nks-statistikk-prod-80c9/boost_data/boost_chat_nlu_day_raw
+
+checks:
+  - metric:
+      name: "Sjekker om gårsdagens data er på plass"
+      query: |
+        SELECT IF(COUNT(1) > 0, 1, 0)
+        FROM boost_data.boost_chat_nlu_day_raw
+        WHERE period = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
+      threshold:
+        must_be_greater_than: 0
+
+columns:
+  - name: period
+    checks:
+      - duplicate:
+          name: "Sjekker om tabellen inneholder duplikater"
