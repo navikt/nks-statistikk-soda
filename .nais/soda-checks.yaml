@@ -489,7 +489,7 @@ data:
             SELECT IF(COUNT(1) > 0, 1, 0)
             FROM tastevalg_agg_mnd.andre_familiehenvendelser
             CROSS JOIN date_to_check
-            WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
+            WHERE DATE(sist_oppdatert_tidspunkt) >= date_to_check.check_date
           threshold:
             must_be_greater_than: 0
       - duplicate:
@@ -514,7 +514,7 @@ data:
             SELECT IF(COUNT(1) > 0, 1, 0)
             FROM tastevalg_agg_mnd.arbeidsavklaringspenger
             CROSS JOIN date_to_check
-            WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
+            WHERE DATE(sist_oppdatert_tidspunkt) >= date_to_check.check_date
           threshold:
             must_be_greater_than: 0
       - duplicate:
@@ -539,7 +539,7 @@ data:
             SELECT IF(COUNT(1) > 0, 1, 0)
             FROM tastevalg_agg_mnd.barnebidrag
             CROSS JOIN date_to_check
-            WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
+            WHERE DATE(sist_oppdatert_tidspunkt) >= date_to_check.check_date
           threshold:
             must_be_greater_than: 0
       - duplicate:
@@ -564,7 +564,7 @@ data:
             SELECT IF(COUNT(1) > 0, 1, 0)
             FROM tastevalg_agg_mnd.barnebidrag_undermeny
             CROSS JOIN date_to_check
-            WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
+            WHERE DATE(sist_oppdatert_tidspunkt) >= date_to_check.check_date
           threshold:
             must_be_greater_than: 0
 
@@ -586,7 +586,7 @@ data:
             SELECT IF(COUNT(1) > 0, 1, 0)
             FROM tastevalg_agg_mnd.foreldrepenger
             CROSS JOIN date_to_check
-            WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
+            WHERE DATE(sist_oppdatert_tidspunkt) >= date_to_check.check_date
           threshold:
             must_be_greater_than: 0
       - duplicate:
@@ -611,7 +611,7 @@ data:
             SELECT IF(COUNT(1) > 0, 1, 0)
             FROM tastevalg_agg_mnd.jobbsoker
             CROSS JOIN date_to_check
-            WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
+            WHERE DATE(sist_oppdatert_tidspunkt) >= date_to_check.check_date
           threshold:
             must_be_greater_than: 0
       - duplicate:
@@ -636,7 +636,7 @@ data:
             SELECT IF(COUNT(1) > 0, 1, 0)
             FROM tastevalg_agg_mnd.pleiepenger
             CROSS JOIN date_to_check
-            WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
+            WHERE DATE(sist_oppdatert_tidspunkt) >= date_to_check.check_date
           threshold:
             must_be_greater_than: 0
       - duplicate:
@@ -661,7 +661,7 @@ data:
             SELECT IF(COUNT(1) > 0, 1, 0)
             FROM tastevalg_agg_mnd.sykepenger
             CROSS JOIN date_to_check
-            WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
+            WHERE DATE(sist_oppdatert_tidspunkt) >= date_to_check.check_date
           threshold:
             must_be_greater_than: 0
       - duplicate:
@@ -686,7 +686,7 @@ data:
             SELECT IF(COUNT(1) > 0, 1, 0)
             FROM tastevalg_agg_mnd.uforetrygd
             CROSS JOIN date_to_check
-            WHERE DATE(sist_oppdatert_tidspunkt) = date_to_check.check_date
+            WHERE DATE(sist_oppdatert_tidspunkt) >= date_to_check.check_date
           threshold:
             must_be_greater_than: 0
       - duplicate:
@@ -711,7 +711,7 @@ data:
             SELECT IF(COUNT(1) > 0, 1, 0)
             FROM tastevalg_agg_dag.menyhendelser
             CROSS JOIN date_to_check
-            WHERE dato = date_to_check.check_date
+            WHERE dato >= date_to_check.check_date
           threshold:
             must_be_greater_than: 0
       - duplicate:
